@@ -46,6 +46,12 @@ Also available [Docker image](https://hub.docker.com/r/gometric/statsd-http-prox
 docker run -p 80:80 gometric/statsd-http-proxy:latest --verbose
 ```
 
+Secure connection:
+
+```
+docker run -p 4433:4433 -v "$(pwd)":/certs/  gometric/statsd-http-proxy:latest --verbose --http-port=4433 --tls-cert=/certs/cert.pem --tls-key=/certs/key.pem
+```
+
 ## Requirements
 
 * [GoMetric/go-statsd-client](https://github.com/GoMetric/go-statsd-client) - StatsD client library for Go
