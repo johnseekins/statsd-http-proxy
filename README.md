@@ -227,6 +227,11 @@ To start server run:
 ```
 nc -kluv localhost 8125
 ```
+To send comamnd to statsd, run:
+
+```
+echo "counters" | nc localhost 8125
+```
 
 ## Benchmark
 
