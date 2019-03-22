@@ -165,6 +165,7 @@ Only the last value during a flush interval is flushed to the backend. If the ga
 Gauge also may be set relatively to previously stored value. 
 Is `shift` not passed, then `value` used. 
 If `value` not passed, used default value equals 1.
+To set a gauge to a negative number you need first set it to 0.
 
 Absolute value:
 ```
