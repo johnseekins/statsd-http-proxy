@@ -138,6 +138,8 @@ We recommend to use JWT tokens to prevent flood requests, setup JWT token expira
 
 ## Rest resources
 
+See [statsd ductmentation](https://github.com/statsd/statsd/blob/master/docs/metric_types.md) about supported types.
+
 ### Heartbeat
 ```
 GET /heartbeat
