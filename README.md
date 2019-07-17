@@ -6,7 +6,7 @@ StatsD HTTP proxy with REST interface for using in browsers
 [![Build Status](https://travis-ci.org/GoMetric/statsd-http-proxy.svg?branch=master)](https://travis-ci.org/GoMetric/statsd-http-proxy)
 [![Code Climate](https://codeclimate.com/github/GoMetric/statsd-http-proxy/badges/gpa.svg?1)](https://codeclimate.com/github/GoMetric/statsd-http-proxy)
 
-This server is a HTTP proxy to StatsD, which used UDP connections.
+This server is a HTTP proxy to StatsD, which uses UDP connections.
 
 Useful for sending metrics to StatsD from frontend by AJAX.
 
