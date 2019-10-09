@@ -12,6 +12,8 @@ addons:
 env:
   - GO111MODULE=on
 
+install: true
+
 matrix:
   include:
     - go: 1.6.x
