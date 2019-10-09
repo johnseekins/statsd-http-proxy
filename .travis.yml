@@ -10,7 +10,7 @@ addons:
       - ubuntu-toolchain-r-test
 
 env:
-  GO111MODULE=on
+  - GO111MODULE=on
 
 matrix:
   include:
