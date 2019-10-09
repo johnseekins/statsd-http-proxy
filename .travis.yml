@@ -31,7 +31,6 @@ matrix:
     
 before_script:
   - gccgo-6 --version
-  - go get -d ./...
   - make build
   
 script:
