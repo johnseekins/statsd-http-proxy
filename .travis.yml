@@ -9,6 +9,9 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
 
+env:
+  GO111MODULE=on
+
 matrix:
   include:
     - go: 1.6.x
