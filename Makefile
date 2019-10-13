@@ -1,5 +1,3 @@
-GOPATH=$(CURDIR)
-
 # build tools
 IS_GCCGO_INSTALLED=$(gccgo --version 2> /dev/null)
 
@@ -21,7 +19,7 @@ default: build
 
 deps:
     ifneq ($(GO111MODULE),on)
-		export GOPATH=$(GOPATH)
+		export GOPATH=$(CURDIR)
 		go get -d ./...
     endif
 
