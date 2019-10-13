@@ -1,3 +1,5 @@
+GOPATH=$(CURDIR)
+
 # build tools
 IS_GCCGO_INSTALLED=$(gccgo --version 2> /dev/null)
 
@@ -17,17 +19,23 @@ GCCGOFLAGS_GOLD=-gccgoflags "-march=native -O3 -fuse-ld=gold"
 # default task
 default: build
 
-deps-gccgo:
-ifndef IS_GCCGO_INSTALLED
-	$(error "gccgo not installed")
-endif
+deps:
+    ifneq ($(GO111MODULE),on)
+		export GOPATH=$(GOPATH)
+		go get -d ./...
+    endif
+
+deps-gccgo: deps
+    ifndef IS_GCCGO_INSTALLED
+		$(error "gccgo not installed")
+    endif
 
 # build with go compiler
-build:
+build: deps
 	CGO_ENABLED=0 go build -v -x -a $(LDFLAGS) -o $(CURDIR)/bin/statsd-http-proxy
 
 # build with go compiler and link optiomizations
-build-shrink:
+build-shrink: deps
 	CGO_ENABLED=0 go build -v -x -a $(LDFLAGS_COMPRESSED) -o $(CURDIR)/bin/statsd-http-proxy-shrink
 
 # build with gccgo compiler
@@ -50,11 +58,11 @@ clean:
 
 # to publish to docker registry we need to be logged in
 docker-login:
-ifdef DOCKER_REGISTRY_USERNAME
-	@echo "h" $(DOCKER_REGISTRY_USERNAME) "h"
-else
-	docker login
-endif
+    ifdef DOCKER_REGISTRY_USERNAME
+		@echo "h" $(DOCKER_REGISTRY_USERNAME) "h"
+    else
+		docker login
+    endif
 
 # build docker images
 docker-build:
