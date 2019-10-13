@@ -1,5 +1,3 @@
-GOPATH=$(CURDIR)
-
 # build tools
 IS_GCCGO_INSTALLED=$(gccgo --version 2> /dev/null)
 
@@ -19,33 +17,35 @@ GCCGOFLAGS_GOLD=-gccgoflags "-march=native -O3 -fuse-ld=gold"
 # default task
 default: build
 
-# install dependencies
 deps:
-	GOPATH=$(GOPATH) go get -d ./...
+    ifneq ($(GO111MODULE),on)
+		export GOPATH=$(CURDIR)
+		go get -d ./...
+    endif
 
-deps-gccgo:
-ifndef IS_GCCGO_INSTALLED
-	$(error "gccgo not installed")
-endif
+deps-gccgo: deps
+    ifndef IS_GCCGO_INSTALLED
+		$(error "gccgo not installed")
+    endif
 
 # build with go compiler
 build: deps
-	GOPATH=$(GOPATH) CGO_ENABLED=0 go build -v -x -a $(LDFLAGS) -o $(CURDIR)/bin/statsd-http-proxy
-
+	ls $(GOPATH)
+	CGO_ENABLED=0 go build -v -x -a $(LDFLAGS) -o $(CURDIR)/bin/statsd-http-proxy
 
 # build with go compiler and link optiomizations
 build-shrink: deps
-	GOPATH=$(GOPATH) CGO_ENABLED=0 go build -v -x -a $(LDFLAGS_COMPRESSED) -o $(CURDIR)/bin/statsd-http-proxy-shrink
+	CGO_ENABLED=0 go build -v -x -a $(LDFLAGS_COMPRESSED) -o $(CURDIR)/bin/statsd-http-proxy-shrink
 
 # build with gccgo compiler
 # Require to install gccgo
-build-gccgo: deps deps-gccgo
-	GOPATH=$(GOPATH) CGO_ENABLED=0 go build -v -x -a -compiler gccgo $(GCCGOFLAGS) -o $(CURDIR)/bin/statsd-http-proxy-gccgo
+build-gccgo: deps-gccgo
+	CGO_ENABLED=0 go build -v -x -a -compiler gccgo $(GCCGOFLAGS) -o $(CURDIR)/bin/statsd-http-proxy-gccgo
 
 # build with gccgo compiler and gold linker
 # Require to install gccgo
-build-gccgo-gold: deps deps-gccgo
-	GOPATH=$(GOPATH) CGO_ENABLED=0 go build -v -x -a -compiler gccgo $(GCCGOFLAGS_GOLD) -o $(CURDIR)/bin/statsd-http-proxy-gccgo-gold
+build-gccgo-gold: deps-gccgo
+	CGO_ENABLED=0 go build -v -x -a -compiler gccgo $(GCCGOFLAGS_GOLD) -o $(CURDIR)/bin/statsd-http-proxy-gccgo-gold
 
 # build all
 build-all: build build-shrink build-gccgo build-gccgo-gold
@@ -57,11 +57,11 @@ clean:
 
 # to publish to docker registry we need to be logged in
 docker-login:
-ifdef DOCKER_REGISTRY_USERNAME
-	@echo "h" $(DOCKER_REGISTRY_USERNAME) "h"
-else
-	docker login
-endif
+    ifdef DOCKER_REGISTRY_USERNAME
+		@echo "h" $(DOCKER_REGISTRY_USERNAME) "h"
+    else
+		docker login
+    endif
 
 # build docker images
 docker-build:
