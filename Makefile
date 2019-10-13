@@ -32,6 +32,7 @@ deps-gccgo: deps
 
 # build with go compiler
 build: deps
+	ls $(GOPATH)
 	CGO_ENABLED=0 go build -v -x -a $(LDFLAGS) -o $(CURDIR)/bin/statsd-http-proxy
 
 # build with go compiler and link optiomizations
