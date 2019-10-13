@@ -13,9 +13,6 @@ install: true
 
 matrix:
   include:
-    - go: 1.6.x
-      env:
-        - GOPATH: ${TRAVIS_BUILD_DIR}
     - go: 1.7.x
       env:
         - GOPATH: ${TRAVIS_BUILD_DIR}
@@ -37,7 +34,6 @@ matrix:
     - go: 1.13.x
     - go: tip
   allow_failures:
-    - go: 1.6.x
     - go: tip
     
 before_script:
