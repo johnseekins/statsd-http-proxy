@@ -5,6 +5,7 @@ import (
 
 	"github.com/GoMetric/go-statsd-client"
 	"github.com/gorilla/mux"
+	"github.com/GoMetric/statsd-http-proxy/proxy/middleware"
 )
 
 type routeHandler struct {
@@ -17,7 +18,7 @@ func NewRouter(
 	statsdClient *statsd.Client,
 	metricPrefix string,
 	tokenSecret string,
-) *routeHandler {
+) http.Handler {
 	// build router
 	router := mux.NewRouter().StrictSlash(true)
 
@@ -28,36 +29,38 @@ func NewRouter(
 	}
 
 	// register http request handlers
-	router.Handle("/heartbeat", middleware.validateCORS(http.HandlerFunc(routeHandler.handleHeartbeatRequest))).Methods("GET")
+	router.Handle(
+		"/heartbeat",
+		middleware.ValidateCORS(http.HandlerFunc(routeHandler.handleHeartbeatRequest))).Methods("GET")
 
 	router.Handle(
 		"/count/{key}",
-		middleware.validateCORS(
-			middleware.validateJWT(
+		middleware.ValidateCORS(
+			middleware.ValidateJWT(
 				http.HandlerFunc(routeHandler.handleCountRequest),
 				tokenSecret)),
 	).Methods("POST")
 
 	router.Handle(
 		"/gauge/{key}",
-		middleware.validateCORS(
-			middleware.validateJWT(
+		middleware.ValidateCORS(
+			middleware.ValidateJWT(
 				http.HandlerFunc(routeHandler.handleGaugeRequest),
 				tokenSecret)),
 	).Methods("POST")
 
 	router.Handle(
 		"/timing/{key}",
-		middleware.validateCORS(
-			middleware.validateJWT(
+		middleware.ValidateCORS(
+			middleware.ValidateJWT(
 				http.HandlerFunc(routeHandler.handleTimingRequest),
 				tokenSecret)),
 	).Methods("POST")
 
 	router.Handle(
 		"/set/{key}",
-		middleware.validateCORS(
-			middleware.validateJWT(
+		middleware.ValidateCORS(
+			middleware.ValidateJWT(
 				http.HandlerFunc(routeHandler.handleSetRequest),
 				tokenSecret)),
 	).Methods("POST")
@@ -71,10 +74,10 @@ func NewRouter(
 		origin := r.Header.Get("Origin")
 		if origin != "" {
 			w.Header().Add("Access-Control-Allow-Origin", origin)
-			w.Header().Add("Access-Control-Allow-Headers", jwtHeaderName+", X-Requested-With, Origin, Accept, Content-Type, Authentication")
+			w.Header().Add("Access-Control-Allow-Headers", middleware.JwtHeaderName+", X-Requested-With, Origin, Accept, Content-Type, Authentication")
 			w.Header().Add("Access-Control-Allow-Methods", "GET, POST, HEAD, OPTIONS")
 		}
 	})
 
-	return &router
+	return router
 }

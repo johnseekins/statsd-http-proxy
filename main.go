@@ -69,15 +69,15 @@ func main() {
 		*metricPrefix = *metricPrefix + "."
 	}
 
-	proxyServer := proxy.NewSever(
-		httpHost,
-		httpPort,
-		statsdHost,
-		statsdPort,
-		tlsCert,
-		tlsKey,
-		tokenSecret,
-		metricPrefix,
+	proxyServer := proxy.NewServer(
+		*httpHost,
+		*httpPort,
+		*statsdHost,
+		*statsdPort,
+		*tlsCert,
+		*tlsKey,
+		*tokenSecret,
+		*metricPrefix,
 	)
 
 	proxyServer.Listen()

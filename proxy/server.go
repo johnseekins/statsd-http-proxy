@@ -6,16 +6,14 @@ import (
 	"net/http"
 	"os"
 	"time"
-
 	"github.com/GoMetric/statsd-http-proxy/proxy/routehandler"
-
 	"github.com/GoMetric/go-statsd-client"
 )
 
 // Server is a proxy server between HTTP REST API and UDP Connection to StatsD
 type Server struct {
 	httpServer *http.Server
-	statsdClient
+	statsdClient *statsd.Client
 	tlsCert string
 	tlsKey  string
 }

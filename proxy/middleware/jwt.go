@@ -9,14 +9,16 @@ import (
 
 const jwtQueryStringKeyName = "token"
 
+const JwtHeaderName = "X-JWT-Token"
+
 // validate JWT middleware
-func validateJWT(next http.Handler, tokenSecret string) http.Handler {
+func ValidateJWT(next http.Handler, tokenSecret string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if tokenSecret == "" {
 			next.ServeHTTP(w, r)
 		} else {
 			// get JWT from header
-			tokenString := r.Header.Get(jwtHeaderName)
+			tokenString := r.Header.Get(JwtHeaderName)
 
 			// get JWT from query string
 			if tokenString == "" {
