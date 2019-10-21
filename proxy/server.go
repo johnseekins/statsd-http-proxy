@@ -6,16 +6,18 @@ import (
 	"net/http"
 	"os"
 	"time"
-	"github.com/GoMetric/statsd-http-proxy/proxy/routehandler"
+
 	"github.com/GoMetric/go-statsd-client"
+	"github.com/GoMetric/statsd-http-proxy/proxy/routehandler"
+	"github.com/GoMetric/statsd-http-proxy/proxy/router"
 )
 
 // Server is a proxy server between HTTP REST API and UDP Connection to StatsD
 type Server struct {
-	httpServer *http.Server
+	httpServer   *http.Server
 	statsdClient *statsd.Client
-	tlsCert string
-	tlsKey  string
+	tlsCert      string
+	tlsKey       string
 }
 
 // NewServer creates new instance of StatsD HTTP Proxy
@@ -35,12 +37,14 @@ func NewServer(
 	// create StatsD Client
 	statsdClient := statsd.NewClient(statsdHost, statsdPort)
 
-	// build router
-	router := routehandler.NewRouter(
+	// build route handler
+	routeHandler := routehandler.NewRouteHandler(
 		statsdClient,
 		metricPrefix,
-		tokenSecret,
 	)
+
+	// build router
+	router := router.NewGorillaMuxRouter(routeHandler, tokenSecret)
 
 	// get HTTP server address to bind
 	httpAddress := fmt.Sprintf("%s:%d", httpHost, httpPort)

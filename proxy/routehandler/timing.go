@@ -8,7 +8,7 @@ import (
 )
 
 // Handle StatsD Timing request
-func (routeHandler *routeHandler) handleTimingRequest(w http.ResponseWriter, r *http.Request) {
+func (routeHandler *RouteHandler) HandleTimingRequest(w http.ResponseWriter, r *http.Request) {
 	// get key
 	vars := mux.Vars(r)
 	key := routeHandler.metricPrefix + vars["key"]

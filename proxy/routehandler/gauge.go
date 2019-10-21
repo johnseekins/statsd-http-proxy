@@ -8,7 +8,7 @@ import (
 )
 
 // Handle StatsD Gauge request
-func (routeHandler *routeHandler) handleGaugeRequest(w http.ResponseWriter, r *http.Request) {
+func (routeHandler *RouteHandler) HandleGaugeRequest(w http.ResponseWriter, r *http.Request) {
 	// get key
 	vars := mux.Vars(r)
 	key := routeHandler.metricPrefix + vars["key"]

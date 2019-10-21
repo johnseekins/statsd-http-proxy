@@ -6,6 +6,6 @@ import (
 )
 
 // Handle heartbeat request
-func (routeHandler *routeHandler) handleHeartbeatRequest(w http.ResponseWriter, r *http.Request) {
+func (routeHandler *RouteHandler) HandleHeartbeatRequest(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "OK")
 }

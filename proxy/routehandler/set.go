@@ -8,7 +8,7 @@ import (
 )
 
 // Handle StatsD Set request
-func (routeHandler *routeHandler) handleSetRequest(w http.ResponseWriter, r *http.Request) {
+func (routeHandler *RouteHandler) HandleSetRequest(w http.ResponseWriter, r *http.Request) {
 	// get key
 	vars := mux.Vars(r)
 	key := routeHandler.metricPrefix + vars["key"]

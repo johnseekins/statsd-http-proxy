@@ -8,7 +8,7 @@ import (
 )
 
 // Handle StatsD Count request
-func (routeHandler *routeHandler) handleCountRequest(w http.ResponseWriter, r *http.Request) {
+func (routeHandler *RouteHandler) HandleCountRequest(w http.ResponseWriter, r *http.Request) {
 	// get key
 	vars := mux.Vars(r)
 	key := routeHandler.metricPrefix + vars["key"]
