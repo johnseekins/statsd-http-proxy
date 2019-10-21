@@ -21,3 +21,6 @@ src
 
 # keys
 *.pem
+
+# module files
+vendor
