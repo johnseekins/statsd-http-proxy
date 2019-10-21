@@ -24,7 +24,7 @@ var BuildDate = "Unknown"
 
 // HTTP connection params
 const defaultHTTPHost = "127.0.0.1"
-const defaultHTTPPort = 80
+const defaultHTTPPort = 8825
 
 // StatsD connection params
 const defaultStatsDHost = "127.0.0.1"
