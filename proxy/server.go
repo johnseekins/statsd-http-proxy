@@ -22,6 +22,9 @@ type Server struct {
 func NewServer(
 	httpHost string,
 	httpPort int,
+	httpReadTimeout int,
+	httpWriteTimeout int,
+	httpIdleTimeout int,
 	statsdHost string,
 	statsdPort int,
 	tlsCert string,
@@ -47,8 +50,9 @@ func NewServer(
 	httpServer := &http.Server{
 		Addr:           httpAddress,
 		Handler:        router,
-		ReadTimeout:    1 * time.Second,
-		WriteTimeout:   1 * time.Second,
+		ReadTimeout:    time.Duration(httpReadTimeout) * time.Second,
+		WriteTimeout:   time.Duration(httpWriteTimeout) * time.Second,
+		IdleTimeout:    time.Duration(httpIdleTimeout) * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 

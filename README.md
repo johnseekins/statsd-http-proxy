@@ -105,6 +105,9 @@ Command line arguments:
 | verbose         | Print debug info to stderr           | Optional. Default false                                                           |
 | http-host       | Host of HTTP server                  | Optional. Default 127.0.0.1. To accept connections on any interface, set to ""    |
 | http-port       | Port of HTTP server                  | Optional. Default 80                                                              |
+| http-timeout-read | The maximum duration in seconds for reading the entire request, including the body | Optional. Defaults to 1 second |
+| http-timeout-write | The maximum duration in seconds before timing out writes of the respons | Optional. Defaults to 1 second  |
+| http-timeout-idle | The maximum amount of time in seconds to wait for the next request when keep-alives are enabled | Optional. Defaults to 1 second |
 | tls-cert        | TLS certificate for the HTTPS        | Optional. Default "" to use HTTP. If both tls-cert and tls-key set, HTTPS is used |
 | tls-key         | TLS private key for the HTTPS        | Optional. Default "" to use HTTP. If both tls-cert and tls-key set, HTTPS is used |
 | statsd-host     | Host of StatsD instance              | Optional. Default 127.0.0.1                                                       |

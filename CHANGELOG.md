@@ -1,5 +1,6 @@
 ## 1.0
   * Default HTTP port changed to 8825
+  * Configure HTTP timeouts through `--http-timeout-read`, `--http-timeout-write` and `--http-timeout-idle`
 
 ## 0.9 (2019-01-29)
   * TLS Secure connection listening
