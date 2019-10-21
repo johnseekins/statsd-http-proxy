@@ -19,38 +19,27 @@ func NewGorillaMuxRouter(
 	// register http request handlers
 	router.Handle(
 		"/heartbeat",
-		middleware.ValidateCORS(http.HandlerFunc(routeHandler.HandleHeartbeatRequest))).Methods("GET")
+		middleware.ValidateCORS(http.HandlerFunc(routeHandler.HandleHeartbeatRequest)),
+	).Methods("GET")
 
 	router.Handle(
 		"/count/{key}",
-		middleware.ValidateCORS(
-			middleware.ValidateJWT(
-				http.HandlerFunc(routeHandler.HandleCountRequest),
-				tokenSecret)),
+		middleware.ValidateCORS(middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleCountRequest), tokenSecret)),
 	).Methods("POST")
 
 	router.Handle(
 		"/gauge/{key}",
-		middleware.ValidateCORS(
-			middleware.ValidateJWT(
-				http.HandlerFunc(routeHandler.HandleGaugeRequest),
-				tokenSecret)),
+		middleware.ValidateCORS(middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleGaugeRequest), tokenSecret)),
 	).Methods("POST")
 
 	router.Handle(
 		"/timing/{key}",
-		middleware.ValidateCORS(
-			middleware.ValidateJWT(
-				http.HandlerFunc(routeHandler.HandleTimingRequest),
-				tokenSecret)),
+		middleware.ValidateCORS(middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleTimingRequest), tokenSecret)),
 	).Methods("POST")
 
 	router.Handle(
 		"/set/{key}",
-		middleware.ValidateCORS(
-			middleware.ValidateJWT(
-				http.HandlerFunc(routeHandler.HandleSetRequest),
-				tokenSecret)),
+		middleware.ValidateCORS(middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleSetRequest), tokenSecret)),
 	).Methods("POST")
 
 	// Handle pre-flight CORS requests
