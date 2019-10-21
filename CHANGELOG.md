@@ -1,4 +1,4 @@
-## 1.0
+## 1.0-dev
   * Default HTTP port changed to 8825
   * Configure HTTP timeouts through `--http-timeout-read`, `--http-timeout-write` and `--http-timeout-idle`
 
