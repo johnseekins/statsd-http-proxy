@@ -30,6 +30,7 @@
 <ul>
     <li><a href="#" data-metric-type="count">Send count</a></li>
     <li><a href="#" data-metric-type="timing">Send timing</a></li>
+    <li><a href="#" data-metric-type="none">Stop send metrics</a></li>
 </ul>
 
 <ul>
@@ -77,6 +78,8 @@
                         time: 100
                     };
                     break;
+                case 'none':
+                    return;
             }
 
             switch (tokenMode) {

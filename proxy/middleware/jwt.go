@@ -46,6 +46,5 @@ func ValidateJWT(next http.Handler, tokenSecret string) http.Handler {
 			// accept request
 			next.ServeHTTP(w, r)
 		}
-
 	})
 }
