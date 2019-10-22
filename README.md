@@ -17,6 +17,7 @@ Authentication optional and based on JWT tokens.
 * [Installation](#installation)
 * [Requirements](#requirements)
 * [Proxy client for browser](#proxy-client-for-browser)
+* [Nginx config](#nginx-config)
 * [Usage](#usage)
 * [Authentication](#authentication)
 * [Rest resources](#rest-resources)
@@ -61,6 +62,36 @@ docker run -p 4433:4433 -v "$(pwd)":/certs/  gometric/statsd-http-proxy:latest -
 ## Proxy client for browser
 
 Basic implementation of proxy client may be found at https://github.com/GoMetric/statsd-http-proxy-client.
+
+## Nginx config
+
+Configuration of Nginx balancer:
+
+```
+server {
+    listen 443 http2;
+
+    server_name statsd-proxy.example.com;
+
+    ssl on;
+    ssl_certificate     /etc/pki/nginx/ssl.crt;
+    ssl_certificate_key /etc/pki/nginx/ssl.key;
+
+    upstream statsd_proxy {
+        keepalive 100;
+        server statsd-proxy-1:8825 max_fails=0;
+        server statsd-proxy-2:8825 max_fails=0;
+    }
+    
+    location / {
+        proxy_pass http://statsd_proxy;
+        proxy_redirect off;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+    }
+}
+```
+
 
 ## Usage
 
