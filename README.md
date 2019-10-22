@@ -72,8 +72,8 @@ server {
     server_name statsd-proxy.example.com;
 
     ssl on;
-    ssl_certificate     /etc/pki/nginx/ssl.crt/wcard.crt;
-    ssl_certificate_key /etc/pki/nginx/ssl.key/wcard.key;
+    ssl_certificate     /etc/pki/nginx/ssl.crt;
+    ssl_certificate_key /etc/pki/nginx/ssl.key;
 
     upstream statsd_proxy {
         keepalive 100;
@@ -83,7 +83,6 @@ server {
     
     location / {
         proxy_pass http://statsd_proxy;
-        proxy_set_header Host $host;
         proxy_redirect off;
         proxy_http_version 1.1;
         proxy_set_header Connection "";
