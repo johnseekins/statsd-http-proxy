@@ -279,7 +279,7 @@ Machine for benchmarking:
 Intel(R) Core(TM) i5-2450M CPU @ 2.50GHz Dual Core / 8 GB RAM
 ```
 
-Siege test:
+Siege test of Gorilla MUX Router:
 
 ```
 $ GOMAXPROCS=2 ./bin/statsd-http-proxy --verbose --http-host=127.0.0.1 --http-port=8080 --statsd-host=127.0.0.1 --statsd-port=8125 --jwt-secret=somesecret

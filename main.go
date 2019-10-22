@@ -63,13 +63,6 @@ func main() {
 		os.Exit(0)
 	}
 
-	// configure verbosity of logging
-	if *verbose == true {
-		log.SetOutput(os.Stderr)
-	} else {
-		log.SetOutput(ioutil.Discard)
-	}
-
 	// prepare metric prefix
 	if *metricPrefix != "" && (*metricPrefix)[len(*metricPrefix)-1:] != "." {
 		*metricPrefix = *metricPrefix + "."
@@ -87,6 +80,7 @@ func main() {
 		*tlsKey,
 		*metricPrefix,
 		*tokenSecret,
+		*verbose
 	)
 
 	proxyServer.Listen()

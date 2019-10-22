@@ -2,6 +2,8 @@ package proxy
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -33,7 +35,20 @@ func NewServer(
 	tlsKey string,
 	metricPrefix string,
 	tokenSecret string,
+	verbose bool,
 ) *Server {
+	// configure logging
+	var logOutput io.Writer
+	if verbose == true {
+		logOutput = os.Stderr
+	} else {
+		logOutput = ioutil.Discard
+	}
+
+	log.SetOutput(logOutput)
+
+	logger := log.New(logOutput, "", log.LstdFlags)
+
 	// create StatsD Client
 	statsdClient := statsd.NewClient(statsdHost, statsdPort)
 
@@ -54,6 +69,7 @@ func NewServer(
 	httpServer := &http.Server{
 		Addr:           httpAddress,
 		Handler:        router,
+		ErrorLog:       logger,
 		ReadTimeout:    time.Duration(httpReadTimeout) * time.Second,
 		WriteTimeout:   time.Duration(httpWriteTimeout) * time.Second,
 		IdleTimeout:    time.Duration(httpIdleTimeout) * time.Second,
