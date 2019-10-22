@@ -26,23 +26,20 @@ func NewGorillaMuxRouter(
 	)
 
 	router.Handle(
-		"/count/{key}",
-		middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleCountRequest), tokenSecret),
-	).Methods(http.MethodPost, http.MethodOptions)
+		"/{type:(count|gauge|timing|set)}/{key}",
+		middleware.ValidateJWT(
+			http.HandlerFunc(
+				func(w http.ResponseWriter, r *http.Request) {
+					// get variables from path
+					vars := mux.Vars(r)
+					metricType := vars["type"]
+					metricKeySuffix := vars["key"]
 
-	router.Handle(
-		"/gauge/{key}",
-		middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleGaugeRequest), tokenSecret),
-	).Methods(http.MethodPost, http.MethodOptions)
-
-	router.Handle(
-		"/timing/{key}",
-		middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleTimingRequest), tokenSecret),
-	).Methods(http.MethodPost, http.MethodOptions)
-
-	router.Handle(
-		"/set/{key}",
-		middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleSetRequest), tokenSecret),
+					routeHandler.HandleMetric(w, r, metricType, metricKeySuffix)
+				},
+			),
+			tokenSecret,
+		),
 	).Methods(http.MethodPost, http.MethodOptions)
 
 	return router

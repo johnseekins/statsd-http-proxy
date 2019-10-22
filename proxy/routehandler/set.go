@@ -3,16 +3,10 @@ package routehandler
 import (
 	"net/http"
 	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
 // Handle StatsD Set request
-func (routeHandler *RouteHandler) HandleSetRequest(w http.ResponseWriter, r *http.Request) {
-	// get key
-	vars := mux.Vars(r)
-	key := routeHandler.metricPrefix + vars["key"]
-
+func (routeHandler *RouteHandler) handleSetRequest(w http.ResponseWriter, r *http.Request, key string) {
 	// get set value
 	var value = 1
 	valuePostFormValue := r.PostFormValue("value")

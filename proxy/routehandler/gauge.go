@@ -3,16 +3,10 @@ package routehandler
 import (
 	"net/http"
 	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
 // Handle StatsD Gauge request
-func (routeHandler *RouteHandler) HandleGaugeRequest(w http.ResponseWriter, r *http.Request) {
-	// get key
-	vars := mux.Vars(r)
-	key := routeHandler.metricPrefix + vars["key"]
-
+func (routeHandler *RouteHandler) handleGaugeRequest(w http.ResponseWriter, r *http.Request, key string) {
 	// get gauge shift
 	shiftPostFormValue := r.PostFormValue("shift")
 	if shiftPostFormValue != "" {

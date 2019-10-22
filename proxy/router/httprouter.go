@@ -24,26 +24,22 @@ func NewHTTPRouter(
 
 	router.Handler(
 		http.MethodPost,
-		"/count/{key}",
-		middleware.ValidateCORS(middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleCountRequest), tokenSecret)),
-	)
+		"/:type/:key",
+		middleware.ValidateCORS(
+			middleware.ValidateJWT(
+				http.HandlerFunc(
+					func(w http.ResponseWriter, r *http.Request) {
+						// get variables from path
+						params := httprouter.ParamsFromContext(r.Context())
+						metricType := params.ByName("type")
+						metricKeySuffix := params.ByName("key")
 
-	router.Handler(
-		http.MethodPost,
-		"/gauge/{key}",
-		middleware.ValidateCORS(middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleGaugeRequest), tokenSecret)),
-	)
-
-	router.Handler(
-		http.MethodPost,
-		"/timing/{key}",
-		middleware.ValidateCORS(middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleTimingRequest), tokenSecret)),
-	)
-
-	router.Handler(
-		http.MethodPost,
-		"/set/{key}",
-		middleware.ValidateCORS(middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleSetRequest), tokenSecret)),
+						routeHandler.HandleMetric(w, r, metricType, metricKeySuffix)
+					},
+				),
+				tokenSecret,
+			),
+		),
 	)
 
 	// Handle pre-flight CORS requests

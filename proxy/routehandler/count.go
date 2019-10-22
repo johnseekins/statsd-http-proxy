@@ -3,16 +3,10 @@ package routehandler
 import (
 	"net/http"
 	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
 // Handle StatsD Count request
-func (routeHandler *RouteHandler) HandleCountRequest(w http.ResponseWriter, r *http.Request) {
-	// get key
-	vars := mux.Vars(r)
-	key := routeHandler.metricPrefix + vars["key"]
-
+func (routeHandler *RouteHandler) handleCountRequest(w http.ResponseWriter, r *http.Request, key string) {
 	// get count value
 	var value = 1
 	valuePostFormValue := r.PostFormValue("value")

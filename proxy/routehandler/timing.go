@@ -3,15 +3,10 @@ package routehandler
 import (
 	"net/http"
 	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
 // Handle StatsD Timing request
-func (routeHandler *RouteHandler) HandleTimingRequest(w http.ResponseWriter, r *http.Request) {
-	// get key
-	vars := mux.Vars(r)
-	key := routeHandler.metricPrefix + vars["key"]
+func (routeHandler *RouteHandler) handleTimingRequest(w http.ResponseWriter, r *http.Request, key string) {
 
 	// get timing
 	time, err := strconv.ParseInt(r.PostFormValue("time"), 10, 64)
