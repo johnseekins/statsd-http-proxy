@@ -3,8 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"os"
 
 	"github.com/GoMetric/statsd-http-proxy/proxy"
@@ -80,7 +78,7 @@ func main() {
 		*tlsKey,
 		*metricPrefix,
 		*tokenSecret,
-		*verbose
+		*verbose,
 	)
 
 	proxyServer.Listen()
