@@ -65,6 +65,8 @@ Basic implementation of proxy client may be found at https://github.com/GoMetric
 
 ## Nginx config
 
+Configuration of Nginx balancer:
+
 ```
 server {
     listen 443 http2;
