@@ -85,8 +85,8 @@ func main() {
 		*statsdPort,
 		*tlsCert,
 		*tlsKey,
-		*tokenSecret,
 		*metricPrefix,
+		*tokenSecret,
 	)
 
 	proxyServer.Listen()
