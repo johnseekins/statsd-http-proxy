@@ -26,7 +26,7 @@ func NewGorillaMuxRouter(
 	)
 
 	router.Handle(
-		"/{type:(count|gauge|timing|set)}/{key}",
+		"/{type:(?:count|gauge|timing|set)}/{key}",
 		middleware.ValidateJWT(
 			http.HandlerFunc(
 				func(w http.ResponseWriter, r *http.Request) {
