@@ -10,5 +10,5 @@ $CURRENT_DIR/../bin/statsd-http-proxy \
     --http-port=8080 \
     --statsd-host=127.0.0.1 \
     --statsd-port=8125 \
-    --jwt-secret=somesecret \
+    --jwt-secret= \
     --metric-prefix=prefix.subprefix

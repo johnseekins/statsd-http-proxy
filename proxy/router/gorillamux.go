@@ -16,45 +16,34 @@ func NewGorillaMuxRouter(
 	// build router
 	router := mux.NewRouter().StrictSlash(true)
 
+	// register common middlewares
+	router.Use(middleware.ValidateCORS)
+
 	// register http request handlers
 	router.Handle(
 		"/heartbeat",
-		middleware.ValidateCORS(http.HandlerFunc(routeHandler.HandleHeartbeatRequest)),
-	).Methods("GET")
+		http.HandlerFunc(routeHandler.HandleHeartbeatRequest),
+	)
 
 	router.Handle(
 		"/count/{key}",
-		middleware.ValidateCORS(middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleCountRequest), tokenSecret)),
-	).Methods("POST")
+		middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleCountRequest), tokenSecret),
+	).Methods(http.MethodPost, http.MethodOptions)
 
 	router.Handle(
 		"/gauge/{key}",
-		middleware.ValidateCORS(middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleGaugeRequest), tokenSecret)),
-	).Methods("POST")
+		middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleGaugeRequest), tokenSecret),
+	).Methods(http.MethodPost, http.MethodOptions)
 
 	router.Handle(
 		"/timing/{key}",
-		middleware.ValidateCORS(middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleTimingRequest), tokenSecret)),
-	).Methods("POST")
+		middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleTimingRequest), tokenSecret),
+	).Methods(http.MethodPost, http.MethodOptions)
 
 	router.Handle(
 		"/set/{key}",
-		middleware.ValidateCORS(middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleSetRequest), tokenSecret)),
-	).Methods("POST")
-
-	// Handle pre-flight CORS requests
-	router.PathPrefix("/").Methods("OPTIONS").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("Access-Control-Request-Method") == "" {
-			return
-		}
-
-		origin := r.Header.Get("Origin")
-		if origin != "" {
-			w.Header().Add("Access-Control-Allow-Origin", origin)
-			w.Header().Add("Access-Control-Allow-Headers", middleware.JwtHeaderName+", X-Requested-With, Origin, Accept, Content-Type, Authentication")
-			w.Header().Add("Access-Control-Allow-Methods", "GET, POST, HEAD, OPTIONS")
-		}
-	})
+		middleware.ValidateJWT(http.HandlerFunc(routeHandler.HandleSetRequest), tokenSecret),
+	).Methods(http.MethodPost, http.MethodOptions)
 
 	return router
 }
