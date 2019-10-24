@@ -45,6 +45,7 @@ var metricPrefix = flag.String("metric-prefix", "", "Prefix of metric name")
 var tokenSecret = flag.String("jwt-secret", "", "Secret to encrypt JWT")
 var verbose = flag.Bool("verbose", false, "Verbose")
 var version = flag.Bool("version", false, "Show version")
+var httpRouterName = flag.String("http-router-name", "GorillaMux", "Type of HTTP router. Allowed values are GorillaMux and HttpRouter. Do not use in production.")
 
 func main() {
 	// get flags
@@ -79,6 +80,7 @@ func main() {
 		*metricPrefix,
 		*tokenSecret,
 		*verbose,
+		*httpRouterName,
 	)
 
 	proxyServer.Listen()

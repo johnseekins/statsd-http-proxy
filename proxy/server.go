@@ -36,6 +36,7 @@ func NewServer(
 	metricPrefix string,
 	tokenSecret string,
 	verbose bool,
+	httpRouterName string,
 ) *Server {
 	// configure logging
 	var logOutput io.Writer
@@ -59,7 +60,15 @@ func NewServer(
 	)
 
 	// build router
-	router := router.NewGorillaMuxRouter(routeHandler, tokenSecret)
+	var httpServerHandler http.Handler
+	switch httpRouterName {
+	case "GorillaMux":
+		httpServerHandler = router.NewGorillaMuxRouter(routeHandler, tokenSecret)
+	case "HttpRouter":
+		httpServerHandler = router.NewHTTPRouter(routeHandler, tokenSecret)
+	default:
+		panic("Passed HTTP router not supported")
+	}
 
 	// get HTTP server address to bind
 	httpAddress := fmt.Sprintf("%s:%d", httpHost, httpPort)
@@ -68,7 +77,7 @@ func NewServer(
 	// create http server
 	httpServer := &http.Server{
 		Addr:           httpAddress,
-		Handler:        router,
+		Handler:        httpServerHandler,
 		ErrorLog:       logger,
 		ReadTimeout:    time.Duration(httpReadTimeout) * time.Second,
 		WriteTimeout:   time.Duration(httpWriteTimeout) * time.Second,
