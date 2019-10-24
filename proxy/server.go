@@ -107,7 +107,7 @@ func (proxyServer *Server) Listen() {
 
 	// start HTTP/HTTPS proxy to StatsD
 	go func() {
-		log.Printf("Starting HTTP server at %s", proxyServer.httpAddress)
+		log.Printf("HTTP server started at %s", proxyServer.httpAddress)
 
 		// open StatsD connection
 		proxyServer.statsdClient.Open()

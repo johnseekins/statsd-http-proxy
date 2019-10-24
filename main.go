@@ -3,6 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 
 	"github.com/GoMetric/statsd-http-proxy/proxy"
@@ -46,6 +49,7 @@ var tokenSecret = flag.String("jwt-secret", "", "Secret to encrypt JWT")
 var verbose = flag.Bool("verbose", false, "Verbose")
 var version = flag.Bool("version", false, "Show version")
 var httpRouterName = flag.String("http-router-name", "GorillaMux", "Type of HTTP router. Allowed values are GorillaMux and HttpRouter. Do not use in production.")
+var profilerHTTPort = flag.Int("profiler-http-port", 0, "Start profiler localhost")
 
 func main() {
 	// get flags
@@ -67,6 +71,17 @@ func main() {
 		*metricPrefix = *metricPrefix + "."
 	}
 
+	// start profiler
+	if *profilerHTTPort > 0 {
+		profilerHTTPAddress := fmt.Sprintf("localhost:%d", *profilerHTTPort)
+		go func() {
+			log.Println("Profiler started at " + profilerHTTPAddress)
+			log.Println("Open 'http://" + profilerHTTPAddress + "/debug/pprof/' in you browser or use 'go tool pprof http://" + profilerHTTPAddress + "/debug/pprof/heap' from console")
+			log.Println(http.ListenAndServe(profilerHTTPAddress, nil))
+		}()
+	}
+
+	// start proxy server
 	proxyServer := proxy.NewServer(
 		*httpHost,
 		*httpPort,
