@@ -77,6 +77,7 @@ func main() {
 		go func() {
 			log.Println("Profiler started at " + profilerHTTPAddress)
 			log.Println("Open 'http://" + profilerHTTPAddress + "/debug/pprof/' in you browser or use 'go tool pprof http://" + profilerHTTPAddress + "/debug/pprof/heap' from console")
+			log.Println("See details about pprof in https://golang.org/pkg/net/http/pprof/")
 			log.Println(http.ListenAndServe(profilerHTTPAddress, nil))
 		}()
 	}
