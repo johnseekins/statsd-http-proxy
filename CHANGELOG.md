@@ -1,6 +1,7 @@
 ## 1.0-dev
   * Default HTTP port changed to 8825
   * Configure HTTP timeouts through `--http-timeout-read`, `--http-timeout-write` and `--http-timeout-idle`
+  * Minumum required Go version is 1.8
 
 ## 0.9 (2019-01-29)
   * TLS Secure connection listening
