@@ -279,32 +279,73 @@ Machine for benchmarking:
 Intel(R) Core(TM) i5-2450M CPU @ 2.50GHz Dual Core / 8 GB RAM
 ```
 
-Siege test of Gorilla MUX Router:
+Os:
+
+```
+Linux hp 4.15.0-65-generic #74-Ubuntu SMP Tue Sep 17 17:06:04 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
+```
+
+Sysctl:
+
+```
+sudo sysctl net.ipv4.ip_local_port_range="15000 61000"
+sudo sysctl net.ipv4.tcp_fin_timeout=30
+```
+
+Proxy's command line parameters:
 
 ```
 $ GOMAXPROCS=2 ./bin/statsd-http-proxy --verbose --http-host=127.0.0.1 --http-port=8080 --statsd-host=127.0.0.1 --statsd-port=8125 --jwt-secret=somesecret
+```
 
-$ time siege -c 255 -r 255 -b -H 'X-JWT-Token:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdGF0c2QtcmVzdC1zZXJ2ZXIiLCJpYXQiOjE1MDY5NzI1ODAsImV4cCI6MTg4NTY2Mzc4MCwiYXVkIjoiaHR0cHM6Ly9naXRodWIuY29tL3Nva2lsL3N0YXRzZC1yZXN0LXNlcnZlciIsInN1YiI6InNva2lsIn0.sOb0ccRBnN1u9IP2jhJrcNod14G5t-jMHNb_fsWov5c' "http://127.0.0.1:8080/count/a.b.c.d POST value=42"
-  ** SIEGE 4.0.2
-  ** Preparing 255 concurrent users for battle.
-  The server is now under siege...
-  Transactions:                  65025 hits
-  Availability:                 100.00 %
-  Elapsed time:                  19.64 secs
-  Data transferred:               0.00 MB
-  Response time:                  0.05 secs
-  Transaction rate:            3310.85 trans/sec
-  Throughput:                     0.00 MB/sec
-  Concurrency:                  180.67
-  Successful transactions:       65025
-  Failed transactions:               0
-  Longest transaction:            1.37
-  Shortest transaction:           0.00
+Siege test of Gorilla MUX Router without keep alive.
 
+```
+time siege -R <(echo connection = close) -c 255 -r 255 -H 'Connection: keep-alive' -H 'X-JWT-Token:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdGF0c2QtcmVzdC1zZXJ2ZXIiLCJpYXQiOjE1MDY5NzI1ODAsImV4cCI6MTg4NTY2Mzc4MCwiYXVkIjoiaHR0cHM6Ly9naXRodWIuY29tL3Nva2lsL3N0YXRzZC1yZXN0LXNlcnZlciIsInN1YiI6InNva2lsIn0.sOb0ccRBnN1u9IP2jhJrcNod14G5t-jMHNb_fsWov5c' "http://127.0.0.1:8080/count/a.b.c.d POST value=42"
+** SIEGE 4.0.4
+** Preparing 255 concurrent users for battle.
+The server is now under siege...
+Transactions:                  65025 hits
+Availability:                 100.00 %
+Elapsed time:                  64.70 secs
+Data transferred:               0.00 MB
+Response time:                  0.25 secs
+Transaction rate:            1005.02 trans/sec
+Throughput:                     0.00 MB/sec
+Concurrency:                  252.40
+Successful transactions:       65025
+Failed transactions:               0
+Longest transaction:            2.75
+Shortest transaction:           0.00
 
-  real    0m19.694s
-  user    0m6.068s
-  sys     0m38.440s
+real    1m4,728s
+user    0m5,363s
+sys     3m37,614s
+```
+Siege test of Gorilla MUX Router with keep alive.
+
+```
+time siege -R <(echo connection = keep-alive) -c 255 -r 255 -H 'Connection: keep-alive' -H 'X-JWT-Token:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdGF0c2QtcmVzdC1zZXJ2ZXIiLCJpYXQiOjE1MDY5NzI1ODAsImV4cCI6MTg4NTY2Mzc4MCwiYXVkIjoiaHR0cHM6Ly9naXRodWIuY29tL3Nva2lsL3N0YXRzZC1yZXN0LXNlcnZlciIsInN1YiI6InNva2lsIn0.sOb0ccRBnN1u9IP2jhJrcNod14G5t-jMHNb_fsWov5c' "http://127.0.0.1:8080/count/a.b.c.d POST value=42"
+** SIEGE 4.0.4
+** Preparing 255 concurrent users for battle.
+The server is now under siege...
+Transactions:                  65025 hits
+Availability:                 100.00 %
+Elapsed time:                   6.65 secs
+Data transferred:               0.00 MB
+Response time:                  0.02 secs
+Transaction rate:            9778.20 trans/sec
+Throughput:                     0.00 MB/sec
+Concurrency:                  233.50
+Successful transactions:       65025
+Failed transactions:               0
+Longest transaction:            0.72
+Shortest transaction:           0.00
+ 
+
+real    0m6,683s
+user    0m5,089s
+sys     0m4,324s
 ```
 
 ## Useful resources
