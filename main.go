@@ -7,6 +7,7 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 	"os"
+	"runtime"
 
 	"github.com/GoMetric/statsd-http-proxy/proxy"
 )
@@ -73,6 +74,10 @@ func main() {
 
 	// start profiler
 	if *profilerHTTPort > 0 {
+		// enable block profiling
+		runtime.SetBlockProfileRate(1)
+
+		// start debug server
 		profilerHTTPAddress := fmt.Sprintf("localhost:%d", *profilerHTTPort)
 		go func() {
 			log.Println("Profiler started at " + profilerHTTPAddress)

@@ -12,16 +12,16 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/GoMetric/go-statsd-client"
 	"github.com/GoMetric/statsd-http-proxy/proxy/routehandler"
 	"github.com/GoMetric/statsd-http-proxy/proxy/router"
+	"github.com/GoMetric/statsd-http-proxy/proxy/statsdclient"
 )
 
 // Server is a proxy server between HTTP REST API and UDP Connection to StatsD
 type Server struct {
 	httpAddress  string
 	httpServer   *http.Server
-	statsdClient *statsd.Client
+	statsdClient statsdclient.StatsdClientInterface
 	tlsCert      string
 	tlsKey       string
 }
@@ -55,7 +55,7 @@ func NewServer(
 	logger := log.New(logOutput, "", log.LstdFlags)
 
 	// create StatsD Client
-	statsdClient := statsd.NewClient(statsdHost, statsdPort)
+	statsdClient := statsdclient.NewGoMetricClient(statsdHost, statsdPort)
 
 	// build route handler
 	routeHandler := routehandler.NewRouteHandler(
