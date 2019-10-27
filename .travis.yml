@@ -35,7 +35,9 @@ matrix:
     
 before_script:
   - gccgo-6 --version
-  - make build
   
 script:
+  - go get -d ./...
+  - go test -v -cover ./...
+  - make build
   - ./bin/statsd-http-proxy --version
