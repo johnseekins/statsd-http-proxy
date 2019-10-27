@@ -3,18 +3,18 @@ package routehandler
 import (
 	"net/http"
 
-	"github.com/GoMetric/go-statsd-client"
+	"github.com/GoMetric/statsd-http-proxy/proxy/statsdclient"
 )
 
 // RouteHandler as a collection of route handlers
 type RouteHandler struct {
-	statsdClient *statsd.Client
+	statsdClient statsdclient.StatsdClientInterface
 	metricPrefix string
 }
 
 // NewRouteHandler creates collection of route handlers
 func NewRouteHandler(
-	statsdClient *statsd.Client,
+	statsdClient statsdclient.StatsdClientInterface,
 	metricPrefix string,
 ) *RouteHandler {
 	// build route handler

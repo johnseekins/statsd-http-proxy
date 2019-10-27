@@ -12,16 +12,16 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/GoMetric/go-statsd-client"
 	"github.com/GoMetric/statsd-http-proxy/proxy/routehandler"
 	"github.com/GoMetric/statsd-http-proxy/proxy/router"
+	"github.com/GoMetric/statsd-http-proxy/proxy/statsdclient"
 )
 
 // Server is a proxy server between HTTP REST API and UDP Connection to StatsD
 type Server struct {
 	httpAddress  string
 	httpServer   *http.Server
-	statsdClient *statsd.Client
+	statsdClient statsdclient.StatsdClientInterface
 	tlsCert      string
 	tlsKey       string
 }
@@ -40,6 +40,7 @@ func NewServer(
 	metricPrefix string,
 	tokenSecret string,
 	verbose bool,
+	httpRouterName string,
 ) *Server {
 	// configure logging
 	var logOutput io.Writer
@@ -54,7 +55,7 @@ func NewServer(
 	logger := log.New(logOutput, "", log.LstdFlags)
 
 	// create StatsD Client
-	statsdClient := statsd.NewClient(statsdHost, statsdPort)
+	statsdClient := statsdclient.NewGoMetricClient(statsdHost, statsdPort)
 
 	// build route handler
 	routeHandler := routehandler.NewRouteHandler(
@@ -63,7 +64,15 @@ func NewServer(
 	)
 
 	// build router
-	router := router.NewGorillaMuxRouter(routeHandler, tokenSecret)
+	var httpServerHandler http.Handler
+	switch httpRouterName {
+	case "GorillaMux":
+		httpServerHandler = router.NewGorillaMuxRouter(routeHandler, tokenSecret)
+	case "HttpRouter":
+		httpServerHandler = router.NewHTTPRouter(routeHandler, tokenSecret)
+	default:
+		panic("Passed HTTP router not supported")
+	}
 
 	// get HTTP server address to bind
 	httpAddress := fmt.Sprintf("%s:%d", httpHost, httpPort)
@@ -71,7 +80,7 @@ func NewServer(
 	// create http server
 	httpServer := &http.Server{
 		Addr:           httpAddress,
-		Handler:        router,
+		Handler:        httpServerHandler,
 		ErrorLog:       logger,
 		ReadTimeout:    time.Duration(httpReadTimeout) * time.Second,
 		WriteTimeout:   time.Duration(httpWriteTimeout) * time.Second,
@@ -98,7 +107,7 @@ func (proxyServer *Server) Listen() {
 
 	// start HTTP/HTTPS proxy to StatsD
 	go func() {
-		log.Printf("Starting HTTP server at %s", proxyServer.httpAddress)
+		log.Printf("HTTP server started at %s", proxyServer.httpAddress)
 
 		// open StatsD connection
 		proxyServer.statsdClient.Open()
