@@ -28,23 +28,26 @@ deps-gccgo: deps
 		$(error "gccgo not installed")
     endif
 
+test: deps
+	go test -v -cover ./...
+
 # build with go compiler
-build: deps
+build: deps test
 	ls $(GOPATH)
 	CGO_ENABLED=0 go build -v -x -a $(LDFLAGS) -o $(CURDIR)/bin/statsd-http-proxy
 
 # build with go compiler and link optiomizations
-build-shrink: deps
+build-shrink: deps test
 	CGO_ENABLED=0 go build -v -x -a $(LDFLAGS_COMPRESSED) -o $(CURDIR)/bin/statsd-http-proxy-shrink
 
 # build with gccgo compiler
 # Require to install gccgo
-build-gccgo: deps-gccgo
+build-gccgo: deps-gccgo test
 	CGO_ENABLED=0 go build -v -x -a -compiler gccgo $(GCCGOFLAGS) -o $(CURDIR)/bin/statsd-http-proxy-gccgo
 
 # build with gccgo compiler and gold linker
 # Require to install gccgo
-build-gccgo-gold: deps-gccgo
+build-gccgo-gold: deps-gccgo test
 	CGO_ENABLED=0 go build -v -x -a -compiler gccgo $(GCCGOFLAGS_GOLD) -o $(CURDIR)/bin/statsd-http-proxy-gccgo-gold
 
 # build all

@@ -29,7 +29,11 @@ matrix:
       env: 
         - GO111MODULE=on
     - go: 1.13.x
+      env: 
+        - GO111MODULE=on
     - go: tip
+      env: 
+        - GO111MODULE=on
   allow_failures:
     - go: tip
     
@@ -38,5 +42,4 @@ before_script:
   
 script:
   - make build
-  - go test -v -cover ./...
   - ./bin/statsd-http-proxy --version
