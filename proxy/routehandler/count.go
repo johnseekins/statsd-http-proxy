@@ -27,7 +27,6 @@ func (routeHandler *RouteHandler) handleCountRequest(w http.ResponseWriter, r *h
 		if err != nil {
 			http.Error(w, "Invalid sample rate specified", 400)
 		}
-
 	}
 
 	// send request

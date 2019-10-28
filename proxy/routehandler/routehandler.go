@@ -32,7 +32,12 @@ func (routeHandler *RouteHandler) getFullyQualifiedMetricKey(metricKeySuffix str
 }
 
 //HandleMetric reads count, gauge, timing and set metrics from HTTP and sent them to StatsD
-func (routeHandler *RouteHandler) HandleMetric(w http.ResponseWriter, r *http.Request, metricType string, metricKeySuffix string) {
+func (routeHandler *RouteHandler) HandleMetric(
+	w http.ResponseWriter,
+	r *http.Request,
+	metricType string,
+	metricKeySuffix string,
+) {
 	// get fully qualified metric key
 	metricKey := routeHandler.getFullyQualifiedMetricKey(metricKeySuffix)
 
