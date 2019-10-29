@@ -20,7 +20,7 @@ default: build
 deps:
     ifneq ($(GO111MODULE),on)
 		export GOPATH=$(CURDIR)
-		go get -d ./...
+		go get -v -t -d ./...
     endif
 
 deps-gccgo: deps
