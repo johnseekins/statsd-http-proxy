@@ -32,22 +32,22 @@ test: deps
 	go test -v -cover ./...
 
 # build with go compiler
-build: deps test
+build: deps
 	ls $(GOPATH)
 	CGO_ENABLED=0 go build -v -x -a $(LDFLAGS) -o $(CURDIR)/bin/statsd-http-proxy
 
 # build with go compiler and link optiomizations
-build-shrink: deps test
+build-shrink: deps
 	CGO_ENABLED=0 go build -v -x -a $(LDFLAGS_COMPRESSED) -o $(CURDIR)/bin/statsd-http-proxy-shrink
 
 # build with gccgo compiler
 # Require to install gccgo
-build-gccgo: deps-gccgo test
+build-gccgo: deps-gccgo
 	CGO_ENABLED=0 go build -v -x -a -compiler gccgo $(GCCGOFLAGS) -o $(CURDIR)/bin/statsd-http-proxy-gccgo
 
 # build with gccgo compiler and gold linker
 # Require to install gccgo
-build-gccgo-gold: deps-gccgo test
+build-gccgo-gold: deps-gccgo
 	CGO_ENABLED=0 go build -v -x -a -compiler gccgo $(GCCGOFLAGS_GOLD) -o $(CURDIR)/bin/statsd-http-proxy-gccgo-gold
 
 # build all

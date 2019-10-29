@@ -67,11 +67,6 @@ func main() {
 		os.Exit(0)
 	}
 
-	// prepare metric prefix
-	if *metricPrefix != "" && (*metricPrefix)[len(*metricPrefix)-1:] != "." {
-		*metricPrefix = *metricPrefix + "."
-	}
-
 	// start profiler
 	if *profilerHTTPort > 0 {
 		// enable block profiling

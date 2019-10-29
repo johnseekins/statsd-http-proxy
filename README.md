@@ -5,6 +5,7 @@ StatsD HTTP proxy with REST interface for using in browsers
 [![Go Report Card](https://goreportcard.com/badge/github.com/GoMetric/statsd-http-proxy?2)](https://goreportcard.com/report/github.com/GoMetric/statsd-http-proxy)
 [![Build Status](https://travis-ci.org/GoMetric/statsd-http-proxy.svg?branch=master)](https://travis-ci.org/GoMetric/statsd-http-proxy)
 [![Code Climate](https://codeclimate.com/github/GoMetric/statsd-http-proxy/badges/gpa.svg?1)](https://codeclimate.com/github/GoMetric/statsd-http-proxy)
+[![Coverage Status](https://coveralls.io/repos/github/GoMetric/statsd-http-proxy/badge.svg?branch=master)](https://coveralls.io/github/GoMetric/statsd-http-proxy?branch=master)
 
 StatsD uses UDP connections, and  can not be used directly from browser. This server is a HTTP proxy to StatsD, useful for sending metrics to StatsD from frontend by AJAX.
 

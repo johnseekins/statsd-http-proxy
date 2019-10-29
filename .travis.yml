@@ -36,10 +36,14 @@ matrix:
         - GO111MODULE=on
   allow_failures:
     - go: tip
-    
+
+before_install:
+  - go get github.com/mattn/goveralls
+
 before_script:
   - gccgo-6 --version
   
 script:
+  - $GOPATH/bin/goveralls -service=travis-ci
   - make build
   - ./bin/statsd-http-proxy --version

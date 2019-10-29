@@ -15,25 +15,57 @@ type statsdClientMock struct {
 
 func (m *statsdClientMock) Open()  {}
 func (m *statsdClientMock) Close() {}
-func (m *statsdClientMock) Count(key string, value int, sampleRate float32) {}
+func (m *statsdClientMock) Count(key string, value int, sampleRate float32) {
+	m.Called(key, value, sampleRate)
+}
 func (m *statsdClientMock) Timing(key string, time int64, sampleRate float32) {}
 func (m *statsdClientMock) Gauge(key string, value int)                       {}
 func (m *statsdClientMock) GaugeShift(key string, value int)                  {}
 func (m *statsdClientMock) Set(key string, value int) {
-	m.Called(key, value, sampleRate)
+	m.Called(key, value)
 }
 
 func TestHandleCountRequest(t *testing.T) {
 	// create statsd client mock
 	statsdClient := new(statsdClientMock)
 
-	statsdClient.On("Set", "a.b.c", 42).Return(nil).Once()
+	statsdClient.On("Count", "someMetricPrefix.a.b.c", 42, float32(0.2)).Return(nil).Once()
 
 	// create route handler
-	routeHandler := RouteHandler{
+	routeHandler := NewRouteHandler(
 		statsdClient,
 		"someMetricPrefix",
-	}
+	)
+
+	// mock requerst
+	request := httptest.NewRequest(
+		"POST",
+		"http://example.com/count/a.b.c",
+		strings.NewReader("value=42&sampleRate=0.2"),
+	)
+
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded; param=value")
+
+	// prepare response
+	responseWriter := httptest.NewRecorder()
+
+	// test count handler
+	routeHandler.HandleMetric(responseWriter, request, "count", "a.b.c")
+
+	statsdClient.AssertExpectations(t)
+}
+
+func TestHandleSetRequest(t *testing.T) {
+	// create statsd client mock
+	statsdClient := new(statsdClientMock)
+
+	statsdClient.On("Set", "someMetricPrefix.a.b.c", 42).Return(nil).Once()
+
+	// create route handler
+	routeHandler := NewRouteHandler(
+		statsdClient,
+		"someMetricPrefix",
+	)
 
 	// mock requerst
 	request := httptest.NewRequest(
@@ -48,7 +80,7 @@ func TestHandleCountRequest(t *testing.T) {
 	responseWriter := httptest.NewRecorder()
 
 	// test count handler
-	routeHandler.handleSetRequest(responseWriter, request, "a.b.c")
+	routeHandler.HandleMetric(responseWriter, request, "set", "a.b.c")
 
 	statsdClient.AssertExpectations(t)
 }

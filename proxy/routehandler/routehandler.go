@@ -17,6 +17,11 @@ func NewRouteHandler(
 	statsdClient statsdclient.StatsdClientInterface,
 	metricPrefix string,
 ) *RouteHandler {
+	// prepare metric prefix
+	if metricPrefix != "" && (metricPrefix)[len(metricPrefix)-1:] != "." {
+		metricPrefix = metricPrefix + "."
+	}
+
 	// build route handler
 	routeHandler := RouteHandler{
 		statsdClient,
