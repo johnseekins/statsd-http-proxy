@@ -31,6 +31,10 @@ deps-gccgo: deps
 test: deps
 	go test -v -cover ./...
 
+goveralls: deps
+	go get github.com/mattn/goveralls
+	$GOPATH/bin/goveralls -service=travis-ci
+
 # build with go compiler
 build: deps
 	ls $(GOPATH)
