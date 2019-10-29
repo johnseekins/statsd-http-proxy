@@ -15,13 +15,13 @@ type statsdClientMock struct {
 
 func (m *statsdClientMock) Open()  {}
 func (m *statsdClientMock) Close() {}
-func (m *statsdClientMock) Count(key string, value int, sampleRate float32) {
-	m.Called(key, value, sampleRate)
-}
+func (m *statsdClientMock) Count(key string, value int, sampleRate float32) {}
 func (m *statsdClientMock) Timing(key string, time int64, sampleRate float32) {}
 func (m *statsdClientMock) Gauge(key string, value int)                       {}
 func (m *statsdClientMock) GaugeShift(key string, value int)                  {}
-func (m *statsdClientMock) Set(key string, value int)                         {}
+func (m *statsdClientMock) Set(key string, value int) {
+	m.Called(key, value, sampleRate)
+}
 
 func TestHandleCountRequest(t *testing.T) {
 	// create statsd client mock
