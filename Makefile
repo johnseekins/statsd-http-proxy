@@ -33,7 +33,7 @@ test: deps
 
 goveralls: deps
 	go get github.com/mattn/goveralls
-	$GOPATH/bin/goveralls -service=travis-ci
+	$(GOPATH)/bin/goveralls -service=travis-ci
 
 # build with go compiler
 build: deps
