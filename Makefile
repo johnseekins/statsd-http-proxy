@@ -29,7 +29,7 @@ deps-gccgo: deps
     endif
 
 test: deps
-	go test -v -cover ./...
+	go test -cover ./...
 
 goveralls: deps
 	go get github.com/mattn/goveralls
