@@ -1,11 +1,13 @@
 package routehandler
 
 import (
+	"io/ioutil"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 // create StatsD Client mock
@@ -29,6 +31,34 @@ func (m *statsdClientMock) GaugeShift(key string, value int) {
 }
 func (m *statsdClientMock) Set(key string, value int) {
 	m.Called(key, value)
+}
+
+func TestHandleHeartbeatRequest(t *testing.T) {
+	// create statsd client mock
+	statsdClient := new(statsdClientMock)
+
+	// create route handler
+	routeHandler := NewRouteHandler(
+		statsdClient,
+		"someMetricPrefix",
+	)
+
+	// mock requerst
+	request := httptest.NewRequest(
+		"GET",
+		"http://example.com/heartbeat",
+		strings.NewReader(""),
+	)
+
+	// prepare response
+	responseWriter := httptest.NewRecorder()
+
+	// test count handler
+	routeHandler.HandleHeartbeatRequest(responseWriter, request)
+
+	body, _ := ioutil.ReadAll(responseWriter.Result().Body)
+
+	require.Equal(t, "OK", string(body))
 }
 
 func TestHandleCountRequest(t *testing.T) {
