@@ -167,7 +167,7 @@ Authentication is optional. It based on passing JWT token to server, encrypted w
 command line argument. If secret not configured in `jwt-secret`, then requests to server accepted without authentication.
 Token sends to server in `X-JWT-Token` header or in `token` query parameter.
 
-We recommend to use JWT tokens to prevent flood requests, setup JWT token expiration time, and update active JWT token in browser.
+We recommend to use JWT tokens to prevent flood requests: you need to setup JWT token expiration time, and update JWT token in browser each time you get 403 in response.
 
 ## Rest resources
 
