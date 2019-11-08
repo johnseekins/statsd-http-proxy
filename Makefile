@@ -80,3 +80,26 @@ docker-publish: docker-build
 	docker login
 	docker push gometric/statsd-http-proxy:latest
 	docker push gometric/statsd-http-proxy:$(VERSION)
+
+# run statsd proxy in http mode
+run-http:
+	GOMAXPROCS=1 go run main.go --verbose --http-host=127.0.0.1 --http-port=8080 --statsd-host=127.0.0.1 --statsd-port=8125 --jwt-secret=somesecret --metric-prefix=prefix.subprefix
+
+# run statsd proxy in http mode with profiling
+run-http-prof:
+	GOMAXPROCS=1 go run main.go --verbose --http-host=127.0.0.1 --http-port=8080 --statsd-host=127.0.0.1 --statsd-port=8125 --jwt-secret=somesecret --metric-prefix=prefix.subprefix -profiler-http-port=6060
+
+# run statsd mock that listen UPD port (for monitoring that proxy sends metrics to UPD)
+run-statsd-mock:
+	nc -kluv localhost 8125
+
+# show profiler results in cli
+run-profiler-cli:
+	go tool pprof http://localhost:6060/debug/pprof/profile
+
+# show profiler results in web
+run-profiler-web:
+	go tool pprof -http=localhost:6061 http://localhost:6060/debug/pprof/profile
+
+run-siege:
+	time siege -c 150 -r 150 -H 'Connection: close' -H 'X-JWT-Token:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdGF0c2QtcmVzdC1zZXJ2ZXIiLCJpYXQiOjE1MDY5NzI1ODAsImV4cCI6MTg4NTY2Mzc4MCwiYXVkIjoiaHR0cHM6Ly9naXRodWIuY29tL3Nva2lsL3N0YXRzZC1yZXN0LXNlcnZlciIsInN1YiI6InNva2lsIn0.sOb0ccRBnN1u9IP2jhJrcNod14G5t-jMHNb_fsWov5c' "http://127.0.0.1:8080/count/a.b.c.d POST value=42"
