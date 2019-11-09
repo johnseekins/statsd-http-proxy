@@ -85,7 +85,7 @@ func NewServer(
 		ReadTimeout:    time.Duration(httpReadTimeout) * time.Second,
 		WriteTimeout:   time.Duration(httpWriteTimeout) * time.Second,
 		IdleTimeout:    time.Duration(httpIdleTimeout) * time.Second,
-		MaxHeaderBytes: 1 << 20,
+		MaxHeaderBytes: 1 << 11,
 	}
 
 	statsdHTTPProxyServer := Server{
