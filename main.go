@@ -35,24 +35,24 @@ const defaultHTTPIdleTimeout = 1
 const defaultStatsDHost = "127.0.0.1"
 const defaultStatsDPort = 8125
 
-// declare command line options
-var httpHost = flag.String("http-host", defaultHTTPHost, "HTTP Host")
-var httpPort = flag.Int("http-port", defaultHTTPPort, "HTTP Port")
-var httpReadTimeout = flag.Int("http-timeout-read", defaultHTTPReadTimeout, "The maximum duration in seconds for reading the entire request, including the body")
-var httpWriteTimeout = flag.Int("http-timeout-write", defaultHTTPWriteTimeout, "The maximum duration in seconds before timing out writes of the respons")
-var httpIdleTimeout = flag.Int("http-timeout-idle", defaultHTTPIdleTimeout, "The maximum amount of time in seconds to wait for the next request when keep-alives are enabled")
-var tlsCert = flag.String("tls-cert", "", "TLS certificate to enable HTTPS")
-var tlsKey = flag.String("tls-key", "", "TLS private key  to enable HTTPS")
-var statsdHost = flag.String("statsd-host", defaultStatsDHost, "StatsD Host")
-var statsdPort = flag.Int("statsd-port", defaultStatsDPort, "StatsD Port")
-var metricPrefix = flag.String("metric-prefix", "", "Prefix of metric name")
-var tokenSecret = flag.String("jwt-secret", "", "Secret to encrypt JWT")
-var verbose = flag.Bool("verbose", false, "Verbose")
-var version = flag.Bool("version", false, "Show version")
-var httpRouterName = flag.String("http-router-name", "GorillaMux", "Type of HTTP router. Allowed values are GorillaMux and HttpRouter. Do not use in production.")
-var profilerHTTPort = flag.Int("profiler-http-port", 0, "Start profiler localhost")
-
 func main() {
+	// declare command line options
+	var httpHost = flag.String("http-host", defaultHTTPHost, "HTTP Host")
+	var httpPort = flag.Int("http-port", defaultHTTPPort, "HTTP Port")
+	var httpReadTimeout = flag.Int("http-timeout-read", defaultHTTPReadTimeout, "The maximum duration in seconds for reading the entire request, including the body")
+	var httpWriteTimeout = flag.Int("http-timeout-write", defaultHTTPWriteTimeout, "The maximum duration in seconds before timing out writes of the respons")
+	var httpIdleTimeout = flag.Int("http-timeout-idle", defaultHTTPIdleTimeout, "The maximum amount of time in seconds to wait for the next request when keep-alives are enabled")
+	var tlsCert = flag.String("tls-cert", "", "TLS certificate to enable HTTPS")
+	var tlsKey = flag.String("tls-key", "", "TLS private key  to enable HTTPS")
+	var statsdHost = flag.String("statsd-host", defaultStatsDHost, "StatsD Host")
+	var statsdPort = flag.Int("statsd-port", defaultStatsDPort, "StatsD Port")
+	var metricPrefix = flag.String("metric-prefix", "", "Prefix of metric name")
+	var tokenSecret = flag.String("jwt-secret", "", "Secret to encrypt JWT")
+	var verbose = flag.Bool("verbose", false, "Verbose")
+	var version = flag.Bool("version", false, "Show version")
+	var httpRouterName = flag.String("http-router-name", "GorillaMux", "Type of HTTP router. Allowed values are GorillaMux and HttpRouter. Do not use in production.")
+	var profilerHTTPort = flag.Int("profiler-http-port", 0, "Start profiler localhost")
+
 	// get flags
 	flag.Parse()
 
