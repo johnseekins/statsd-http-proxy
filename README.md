@@ -291,6 +291,8 @@ sudo sysctl net.ipv4.ip_local_port_range="15000 61000"
 sudo sysctl net.ipv4.tcp_fin_timeout=30
 ```
 
+Benchmarked by siege v. 4.0.4
+
 ### Proxy CLI arguments
 
 Without JWT token:
@@ -335,12 +337,16 @@ $ siege -R <(echo connection = keep-alive) -c 255 -r 2000 -H 'X-JWT-Token:eyJ0eX
 
 Concurent 255 users made 2000 each. Total request count: 510000
 
-| Router     | Keep alive | JWT      | Elapsed time | Transaction rate  | Concurrency |
-|------------|------------|----------|--------------|-------------------|-------------|
-| GorillaMux | disabled   | disabled | 94.73 secs   | 5383.72 trans/sec | 244.02      |
-| GorillaMux | enabled    | disabled | 55.70 secs   | 9156.19 trans/sec | 252.27      |
-| GorillaMux | disabled   | enabled  | 117.80 secs  | 4329.37 trans/sec | 245.98      |
-| GorillaMux | enabled    | enabled  | 77.97 secs   | 6540.98 trans/sec | 253.70      |
+| Router           | Keep alive | JWT      | Elapsed time | Transaction rate  | Concurrency |
+|------------------|------------|----------|--------------|-------------------|-------------|
+| GorillaMux 1.7.3 | disabled   | disabled | 94.73 secs   | 5383.72 trans/sec | 244.02      |
+| GorillaMux 1.7.3 | enabled    | disabled | 55.70 secs   | 9156.19 trans/sec | 252.27      |
+| GorillaMux 1.7.3 | disabled   | enabled  | 117.80 secs  | 4329.37 trans/sec | 245.98      |
+| GorillaMux 1.7.3 | enabled    | enabled  | 77.97 secs   | 6540.98 trans/sec | 253.70      |
+| HttpRouter 1.3.0 | disabled   | disabled | 103.71 secs  | 4917.56 trans/sec | 243.64      |
+| HttpRouter 1.3.0 | enabled    | disabled |              |                   |             |
+| HttpRouter 1.3.0 | disabled   | enabled  |              |                   |             |
+| HttpRouter 1.3.0 | enabled    | enabled  |              |                   |             |
 
 
 ## Useful resources
