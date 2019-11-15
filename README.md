@@ -293,49 +293,54 @@ sudo sysctl net.ipv4.tcp_fin_timeout=30
 
 ### Proxy CLI arguments
 
-With JWT token:
-
-```
-$ GOMAXPROCS=1 ./bin/statsd-http-proxy --http-host=127.0.0.1 --http-port=8080 --statsd-host=127.0.0.1 --statsd-port=8125 --jwt-secret=somesecret
-```
-
 Without JWT token:
 
 ```
 $ GOMAXPROCS=1 ./bin/statsd-http-proxy --http-host=127.0.0.1 --http-port=8080 --statsd-host=127.0.0.1 --statsd-port=8125
 ```
 
-### Router: Gorilla MUX, Keep alive: disabled, JWT auth: disabled
+With JWT token:
 
 ```
-siege-R <(echo connection = close) -c 255 -r 2000 "http://127.0.0.1:8080/count/a.b.c.d POST value=42"
+$ GOMAXPROCS=1 ./bin/statsd-http-proxy --http-host=127.0.0.1 --http-port=8080 --statsd-host=127.0.0.1 --statsd-port=8125 --jwt-secret=somesecret
 ```
 
-### Router: Gorilla MUX, Keep alive: disabled, JWT auth: enabled
+### Requests to proxy
+
+#### Router: Gorilla MUX, Keep alive: disabled, JWT auth: disabled
 
 ```
-siege -R <(echo connection = close) -c 255 -r 2000 -H 'X-JWT-Token:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdGF0c2QtcmVzdC1zZXJ2ZXIiLCJpYXQiOjE1MDY5NzI1ODAsImV4cCI6MTg4NTY2Mzc4MCwiYXVkIjoiaHR0cHM6Ly9naXRodWIuY29tL3Nva2lsL3N0YXRzZC1yZXN0LXNlcnZlciIsInN1YiI6InNva2lsIn0.sOb0ccRBnN1u9IP2jhJrcNod14G5t-jMHNb_fsWov5c' "http://127.0.0.1:8080/count/a.b.c.d POST value=42"
+siege -R <(echo connection = close) -c 255 -r 2000 "http://127.0.0.1:8080/count/a.b.c.d POST value=42"
 ```
 
-
-### Router: Gorilla MUX, Keep alive: enabled, JWT auth: enabled
-
-```
-time siege -R <(echo connection = keep-alive) -c 255 -r 2000 -H 'X-JWT-Token:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdGF0c2QtcmVzdC1zZXJ2ZXIiLCJpYXQiOjE1MDY5NzI1ODAsImV4cCI6MTg4NTY2Mzc4MCwiYXVkIjoiaHR0cHM6Ly9naXRodWIuY29tL3Nva2lsL3N0YXRzZC1yZXN0LXNlcnZlciIsInN1YiI6InNva2lsIn0.sOb0ccRBnN1u9IP2jhJrcNod14G5t-jMHNb_fsWov5c' "http://127.0.0.1:8080/count/a.b.c.d POST value=42"
-```
-
-### Router: Gorilla MUX, Keep alive: enabled, JWT auth: disabled
+#### Router: Gorilla MUX, Keep alive: enabled, JWT auth: disabled
 
 ```
-time siege -R <(echo connection = keep-alive) -c 255 -r 2000 "http://127.0.0.1:8080/count/a.b.c.d POST value=42"
+$ siege -R <(echo connection = keep-alive) -c 255 -r 2000 "http://127.0.0.1:8080/count/a.b.c.d POST value=42"
+```
+
+#### Router: Gorilla MUX, Keep alive: disabled, JWT auth: enabled
+
+```
+$ siege -R <(echo connection = close) -c 255 -r 2000 -H 'X-JWT-Token:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdGF0c2QtcmVzdC1zZXJ2ZXIiLCJpYXQiOjE1MDY5NzI1ODAsImV4cCI6MTg4NTY2Mzc4MCwiYXVkIjoiaHR0cHM6Ly9naXRodWIuY29tL3Nva2lsL3N0YXRzZC1yZXN0LXNlcnZlciIsInN1YiI6InNva2lsIn0.sOb0ccRBnN1u9IP2jhJrcNod14G5t-jMHNb_fsWov5c' "http://127.0.0.1:8080/count/a.b.c.d POST value=42"
+```
+
+#### Router: Gorilla MUX, Keep alive: enabled, JWT auth: enabled
+
+```
+$ siege -R <(echo connection = keep-alive) -c 255 -r 2000 -H 'X-JWT-Token:eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdGF0c2QtcmVzdC1zZXJ2ZXIiLCJpYXQiOjE1MDY5NzI1ODAsImV4cCI6MTg4NTY2Mzc4MCwiYXVkIjoiaHR0cHM6Ly9naXRodWIuY29tL3Nva2lsL3N0YXRzZC1yZXN0LXNlcnZlciIsInN1YiI6InNva2lsIn0.sOb0ccRBnN1u9IP2jhJrcNod14G5t-jMHNb_fsWov5c' "http://127.0.0.1:8080/count/a.b.c.d POST value=42"
 ```
 
 ### Results
 
-Concurent 255 users made 2000 each. Total request count: 
+Concurent 255 users made 2000 each. Total request count: 510000
 
-| Router | Keep alive | JWT | Elapsed time | Transaction rate | Concurrency |
-|--------|------------|------|-------------|------------------|-------------|
+| Router     | Keep alive | JWT      | Elapsed time | Transaction rate  | Concurrency |
+|------------|------------|----------|--------------|-------------------|-------------|
+| GorillaMux | disabled   | disabled | 94.73 secs   | 5383.72 trans/sec | 244.02      |
+| GorillaMux | enabled    | disabled | 55.70 secs   | 9156.19 trans/sec | 252.27      |
+| GorillaMux | disabled   | enabled  | 117.80 secs  | 4329.37 trans/sec | 245.98      |
+| GorillaMux | enabled    | enabled  | 77.97 secs   | 6540.98 trans/sec | 253.70      |
 
 
 ## Useful resources
