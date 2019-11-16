@@ -335,7 +335,7 @@ $ siege -R <(echo connection = keep-alive) -c 255 -r 2000 -H 'X-JWT-Token:eyJ0eX
 
 ### Results
 
-Concurent 255 users made 2000 each. Total request count: 510000
+Concurent 255 users made 2000 requests each. Total request count: 510000
 
 | Router           | Keep alive | JWT      | Elapsed time | Transaction rate  | Concurrency |
 |------------------|------------|----------|--------------|-------------------|-------------|
