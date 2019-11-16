@@ -343,10 +343,10 @@ Concurent 255 users made 2000 each. Total request count: 510000
 | GorillaMux 1.7.3 | enabled    | disabled | 55.70 secs   | 9156.19 trans/sec | 252.27      |
 | GorillaMux 1.7.3 | disabled   | enabled  | 117.80 secs  | 4329.37 trans/sec | 245.98      |
 | GorillaMux 1.7.3 | enabled    | enabled  | 77.97 secs   | 6540.98 trans/sec | 253.70      |
-| HttpRouter 1.3.0 | disabled   | disabled | 103.71 secs  | 4917.56 trans/sec | 243.64      |
-| HttpRouter 1.3.0 | enabled    | disabled |              |                   |             |
-| HttpRouter 1.3.0 | disabled   | enabled  |              |                   |             |
-| HttpRouter 1.3.0 | enabled    | enabled  |              |                   |             |
+| HttpRouter 1.3.0 | disabled   | disabled | 92.93 secs   | 5487.99 trans/sec | 244.09      |
+| HttpRouter 1.3.0 | enabled    | disabled | 54.87 secs   | 9294.70 trans/sec | 252.65      |
+| HttpRouter 1.3.0 | disabled   | enabled  | 115.35 secs  | 4421.33 trans/sec | 245.48      |
+| HttpRouter 1.3.0 | enabled    | enabled  | 75.14 secs   | 6787.33 trans/sec | 253.25      |
 
 
 ## Useful resources
