@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 )
 
 func (routeHandler *RouteHandler) handleCountRequest(w http.ResponseWriter, r *http.Request, key string) {
@@ -81,17 +80,16 @@ func (routeHandler *RouteHandler) handleGaugeRequest(w http.ResponseWriter, r *h
 }
 
 func (routeHandler *RouteHandler) handleTimingRequest(w http.ResponseWriter, r *http.Request, key string) {
-	var duration time.Duration
+	var duration int64
 
 	valuePostFormDur := r.PostFormValue("dur")
 	if valuePostFormDur != "" {
-		d, err := strconv.ParseInt(r.PostFormValue("dur"), 10, 64)
+		var err error
+		duration, err = strconv.ParseInt(r.PostFormValue("dur"), 10, 64)
 		if err != nil {
 			http.Error(w, "Invalid dur specified", 400)
 			return
 		}
-
-		duration = time.Duration(d) * time.Millisecond
 	}
 
 	valuePostFormTags := r.PostFormValue("tags")
@@ -105,8 +103,7 @@ func (routeHandler *RouteHandler) handleTimingRequest(w http.ResponseWriter, r *
 		}
 	}
 
-	// send request
-	routeHandler.statter.Timing(key, duration)
+	routeHandler.statter.Timing(key, int(duration))
 }
 
 func (routeHandler *RouteHandler) handleUniqueRequest(w http.ResponseWriter, r *http.Request, key string) {

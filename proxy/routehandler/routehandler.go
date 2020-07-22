@@ -24,7 +24,6 @@ func NewRouteHandler(
 	return &routeHandler
 }
 
-//HandleMetric reads count, gauge, timing and set metrics from HTTP and sent them to StatsD
 func (routeHandler *RouteHandler) HandleMetric(
 	w http.ResponseWriter,
 	r *http.Request,
