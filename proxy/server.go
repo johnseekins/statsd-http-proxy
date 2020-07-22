@@ -12,18 +12,17 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/GoMetric/statsd-http-proxy/proxy/routehandler"
-	"github.com/GoMetric/statsd-http-proxy/proxy/router"
-	"github.com/GoMetric/statsd-http-proxy/proxy/statsdclient"
+	"github.com/InjectiveLabs/statsd-http-proxy/proxy/routehandler"
+	"github.com/InjectiveLabs/statsd-http-proxy/proxy/router"
+	"github.com/InjectiveLabs/statsd-http-proxy/proxy/statsdclient"
 )
 
 // Server is a proxy server between HTTP REST API and UDP Connection to StatsD
 type Server struct {
-	httpAddress  string
-	httpServer   *http.Server
-	statsdClient statsdclient.StatsdClientInterface
-	tlsCert      string
-	tlsKey       string
+	httpAddress string
+	httpServer  *http.Server
+	tlsCert     string
+	tlsKey      string
 }
 
 // NewServer creates new instance of StatsD HTTP Proxy
@@ -40,7 +39,6 @@ func NewServer(
 	metricPrefix string,
 	tokenSecret string,
 	verbose bool,
-	httpRouterName string,
 ) *Server {
 	// configure logging
 	var logOutput io.Writer
@@ -54,25 +52,21 @@ func NewServer(
 
 	logger := log.New(logOutput, "", log.LstdFlags)
 
+	// prepare metric prefix
+	if metricPrefix != "" && (metricPrefix)[len(metricPrefix)-1:] != "." {
+		metricPrefix = metricPrefix + "."
+	}
+
 	// create StatsD Client
-	statsdClient := statsdclient.NewGoMetricClient(statsdHost, statsdPort)
+	statsdclient.Init(fmt.Sprintf("%s:%d", statsdHost, statsdPort), metricPrefix)
 
 	// build route handler
 	routeHandler := routehandler.NewRouteHandler(
-		statsdClient,
-		metricPrefix,
+		statsdclient.Client(),
 	)
 
 	// build router
-	var httpServerHandler http.Handler
-	switch httpRouterName {
-	case "GorillaMux":
-		httpServerHandler = router.NewGorillaMuxRouter(routeHandler, tokenSecret)
-	case "HttpRouter":
-		httpServerHandler = router.NewHTTPRouter(routeHandler, tokenSecret)
-	default:
-		panic("Passed HTTP router not supported")
-	}
+	httpServerHandler := router.NewHTTPRouter(routeHandler, tokenSecret)
 
 	// get HTTP server address to bind
 	httpAddress := fmt.Sprintf("%s:%d", httpHost, httpPort)
@@ -91,7 +85,6 @@ func NewServer(
 	statsdHTTPProxyServer := Server{
 		httpAddress,
 		httpServer,
-		statsdClient,
 		tlsCert,
 		tlsKey,
 	}
@@ -110,8 +103,7 @@ func (proxyServer *Server) Listen() {
 		log.Printf("Starting HTTP server at %s", proxyServer.httpAddress)
 
 		// open StatsD connection
-		proxyServer.statsdClient.Open()
-		defer proxyServer.statsdClient.Close()
+		defer statsdclient.Close()
 
 		// open HTTP connection
 		var err error

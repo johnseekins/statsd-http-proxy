@@ -3,8 +3,8 @@ package router
 import (
 	"net/http"
 
-	"github.com/GoMetric/statsd-http-proxy/proxy/middleware"
-	"github.com/GoMetric/statsd-http-proxy/proxy/routehandler"
+	"github.com/InjectiveLabs/statsd-http-proxy/proxy/middleware"
+	"github.com/InjectiveLabs/statsd-http-proxy/proxy/routehandler"
 	"github.com/julienschmidt/httprouter"
 )
 

@@ -9,7 +9,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/GoMetric/statsd-http-proxy/proxy"
+	"github.com/InjectiveLabs/statsd-http-proxy/proxy"
 )
 
 // Version is a current git commit hash and tag
@@ -50,7 +50,6 @@ func main() {
 	var tokenSecret = flag.String("jwt-secret", "", "Secret to encrypt JWT")
 	var verbose = flag.Bool("verbose", false, "Verbose")
 	var version = flag.Bool("version", false, "Show version")
-	var httpRouterName = flag.String("http-router-name", "GorillaMux", "Type of HTTP router. Allowed values are GorillaMux and HttpRouter. Do not use in production.")
 	var profilerHTTPort = flag.Int("profiler-http-port", 0, "Start profiler localhost")
 
 	// get flags
@@ -96,7 +95,6 @@ func main() {
 		*metricPrefix,
 		*tokenSecret,
 		*verbose,
-		*httpRouterName,
 	)
 
 	proxyServer.Listen()
