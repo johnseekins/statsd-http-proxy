@@ -1,130 +1,172 @@
 package routehandler
 
 import (
+	"encoding/json"
+	"io"
+	"io/ioutil"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
-func (routeHandler *RouteHandler) handleCountRequest(w http.ResponseWriter, r *http.Request, key string) {
-	var value = 0
-	valuePostFormValue := r.PostFormValue("n")
-	if valuePostFormValue != "" {
-		var err error
-		value, err = strconv.Atoi(valuePostFormValue)
-		if err != nil {
-			http.Error(w, "Invalid n specified", 400)
-			return
-		}
-	}
-
-	valuePostFormTags := r.PostFormValue("tags")
-	valuePostFormTags = strings.TrimSpace(valuePostFormTags)
-	if valuePostFormTags != "" {
-		if validateTags(valuePostFormTags) {
-			key += "," + valuePostFormTags
-		} else {
-			http.Error(w, "Invalid tags specified", 400)
-			return
-		}
-	}
-
-	routeHandler.statter.Count(key, value)
+type CountRequest struct {
+	N    int    `json:"n,omitempty"`
+	Tags string `json:"tags,omitempty"`
 }
 
-func (routeHandler *RouteHandler) handleIncrementRequest(w http.ResponseWriter, r *http.Request, key string) {
-	valuePostFormValue := r.PostFormValue("n")
-	if valuePostFormValue != "" {
-		http.Error(w, "Cannot specify n or value for incr", 400)
+const maxBodySize = 10 * 1024 * 1024
+
+func (routeHandler *RouteHandler) handleCountRequest(w http.ResponseWriter, r *http.Request, key string) {
+	if contentType := r.Header.Get("Content-Type"); contentType != "application/json" {
+		http.Error(w, "Unsupported content type", 400)
 		return
 	}
 
-	valuePostFormTags := r.PostFormValue("tags")
-	valuePostFormTags = strings.TrimSpace(valuePostFormTags)
-	if valuePostFormTags != "" {
-		if validateTags(valuePostFormTags) {
-			key += "," + valuePostFormTags
-		} else {
-			http.Error(w, "Invalid tags specified", 400)
-			return
-		}
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, maxBodySize))
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	r.Body.Close()
+
+	var req CountRequest
+	if err := json.Unmarshal(body, &req); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	reqTags := strings.TrimSpace(req.Tags)
+	if validateTags(reqTags) {
+		key += "," + reqTags
+	}
+
+	routeHandler.statter.Count(key, req.N)
+}
+
+type IncrRequest struct {
+	Tags string `json:"tags,omitempty"`
+}
+
+func (routeHandler *RouteHandler) handleIncrementRequest(w http.ResponseWriter, r *http.Request, key string) {
+	if contentType := r.Header.Get("Content-Type"); contentType != "application/json" {
+		http.Error(w, "Unsupported content type", 400)
+		return
+	}
+
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, maxBodySize))
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	r.Body.Close()
+
+	var req IncrRequest
+	if err := json.Unmarshal(body, &req); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	reqTags := strings.TrimSpace(req.Tags)
+	if validateTags(reqTags) {
+		key += "," + reqTags
 	}
 
 	routeHandler.statter.Increment(key)
 }
 
+type GaugeRequest struct {
+	Value int    `json:"value,omitempty"`
+	Tags  string `json:"tags,omitempty"`
+}
+
 func (routeHandler *RouteHandler) handleGaugeRequest(w http.ResponseWriter, r *http.Request, key string) {
-	var value = 0
-	valuePostFormValue := r.PostFormValue("value")
-	if valuePostFormValue != "" {
-		var err error
-		value, err = strconv.Atoi(valuePostFormValue)
-		if err != nil {
-			http.Error(w, "Invalid gauge value specified", 400)
-			return
-		}
-	}
-
-	valuePostFormTags := r.PostFormValue("tags")
-	valuePostFormTags = strings.TrimSpace(valuePostFormTags)
-	if valuePostFormTags != "" {
-		if validateTags(valuePostFormTags) {
-			key += "," + valuePostFormTags
-		} else {
-			http.Error(w, "Invalid tags specified", 400)
-			return
-		}
-	}
-
-	routeHandler.statter.Gauge(key, value)
-}
-
-func (routeHandler *RouteHandler) handleTimingRequest(w http.ResponseWriter, r *http.Request, key string) {
-	var duration int64
-
-	valuePostFormDur := r.PostFormValue("dur")
-	if valuePostFormDur != "" {
-		var err error
-		duration, err = strconv.ParseInt(r.PostFormValue("dur"), 10, 64)
-		if err != nil {
-			http.Error(w, "Invalid dur specified", 400)
-			return
-		}
-	}
-
-	valuePostFormTags := r.PostFormValue("tags")
-	valuePostFormTags = strings.TrimSpace(valuePostFormTags)
-	if valuePostFormTags != "" {
-		if validateTags(valuePostFormTags) {
-			key += "," + valuePostFormTags
-		} else {
-			http.Error(w, "Invalid tags specified", 400)
-			return
-		}
-	}
-
-	routeHandler.statter.Timing(key, int(duration))
-}
-
-func (routeHandler *RouteHandler) handleUniqueRequest(w http.ResponseWriter, r *http.Request, key string) {
-	valuePostFormValue := r.PostFormValue("value")
-	if valuePostFormValue == "" {
-		http.Error(w, "Invalid unique value specified", 400)
+	if contentType := r.Header.Get("Content-Type"); contentType != "application/json" {
+		http.Error(w, "Unsupported content type", 400)
 		return
 	}
 
-	valuePostFormTags := r.PostFormValue("tags")
-	valuePostFormTags = strings.TrimSpace(valuePostFormTags)
-	if valuePostFormTags != "" {
-		if validateTags(valuePostFormTags) {
-			key += "," + valuePostFormTags
-		} else {
-			http.Error(w, "Invalid tags specified", 400)
-			return
-		}
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, maxBodySize))
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	r.Body.Close()
+
+	var req GaugeRequest
+	if err := json.Unmarshal(body, &req); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
 	}
 
-	routeHandler.statter.Unique(key, valuePostFormValue)
+	reqTags := strings.TrimSpace(req.Tags)
+	if validateTags(reqTags) {
+		key += "," + reqTags
+	}
+
+	routeHandler.statter.Gauge(key, req.Value)
+}
+
+type TimingRequest struct {
+	Duration int    `json:"dur,omitempty"`
+	Tags     string `json:"tags,omitempty"`
+}
+
+func (routeHandler *RouteHandler) handleTimingRequest(w http.ResponseWriter, r *http.Request, key string) {
+	if contentType := r.Header.Get("Content-Type"); contentType != "application/json" {
+		http.Error(w, "Unsupported content type", 400)
+		return
+	}
+
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, maxBodySize))
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	r.Body.Close()
+
+	var req TimingRequest
+	if err := json.Unmarshal(body, &req); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	reqTags := strings.TrimSpace(req.Tags)
+	if validateTags(reqTags) {
+		key += "," + reqTags
+	}
+
+	routeHandler.statter.Timing(key, req.Duration)
+}
+
+type UniqueRequest struct {
+	Value string `json:"value,omitempty"`
+	Tags  string `json:"tags,omitempty"`
+}
+
+func (routeHandler *RouteHandler) handleUniqueRequest(w http.ResponseWriter, r *http.Request, key string) {
+	if contentType := r.Header.Get("Content-Type"); contentType != "application/json" {
+		http.Error(w, "Unsupported content type", 400)
+		return
+	}
+
+	body, err := ioutil.ReadAll(io.LimitReader(r.Body, maxBodySize))
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	r.Body.Close()
+
+	var req UniqueRequest
+	if err := json.Unmarshal(body, &req); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+
+	reqTags := strings.TrimSpace(req.Tags)
+	if validateTags(reqTags) {
+		key += "," + reqTags
+	}
+
+	routeHandler.statter.Unique(key, req.Value)
 }
 
 func validateTags(tagsList string) bool {
