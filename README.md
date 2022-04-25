@@ -170,11 +170,11 @@ data: {
 
 ### `count`
 
-Adds count to the bucket. Expected `n` as integer. By default `n` is 0.
+Adds count to the bucket. Expected `value` as integer. By default `value` is 0.
 
 ### `incr`
 
-Increments the given bucket. It is equivalent to count with `n` default to 1.
+Increments the given bucket. It is equivalent to count with `value` default to 1.
 
 ### `gauge`
 
@@ -182,7 +182,7 @@ Sets the gauge metric. Expected `value` as integer. Before setting negative gaug
 
 ### `timing`
 
-Adds timing to the bucket. Expected `dur` as milliseconds integer. Default is `0`.
+Adds timing to the bucket. Expected `value` as milliseconds integer. Default is `0`.
 
 ### `uniq`
 
