@@ -56,7 +56,7 @@ func main() {
 	flag.Parse()
 
 	// show version and exit
-	if *version == true {
+	if *version {
 		fmt.Printf(
 			"StatsD HTTP Proxy v.%s, build %s from %s\n",
 			Version,

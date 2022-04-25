@@ -42,7 +42,7 @@ func NewServer(
 ) *Server {
 	// configure logging
 	var logOutput io.Writer
-	if verbose == true {
+	if verbose {
 		logOutput = os.Stderr
 	} else {
 		logOutput = ioutil.Discard
