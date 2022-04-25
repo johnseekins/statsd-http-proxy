@@ -12,17 +12,17 @@ import (
 	"github.com/johnseekins/statsd-http-proxy/proxy"
 )
 
-// Version is a current git commit hash and tag
+// Version is a current git tag
 // Injected by compilation flag
 var Version = "Unknown"
 
-// BuildNumber is a current commit hash
-// Injected by compilation flag
-var BuildNumber = "Unknown"
-
 // BuildDate is a date of build
 // Injected by compilation flag
-var BuildDate = "Unknown"
+var BuildTime = "Unknown"
+
+// BuildUser is the user that built
+// Injected by compilation flag
+var BuildUser = "Unknown"
 
 // HTTP connection params
 const defaultHTTPHost = "127.0.0.1"
@@ -58,10 +58,10 @@ func main() {
 	// show version and exit
 	if *version {
 		fmt.Printf(
-			"StatsD HTTP Proxy v.%s, build %s from %s\n",
+			"StatsD HTTP Proxy v.%s, built on %s by %s\n",
 			Version,
-			BuildNumber,
-			BuildDate,
+			BuildTime,
+			BuildUser,
 		)
 		os.Exit(0)
 	}

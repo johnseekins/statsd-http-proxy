@@ -1,6 +1,6 @@
 module github.com/johnseekins/statsd-http-proxy
 
-go 1.18
+go 1.17
 
 require (
 	github.com/GoMetric/go-statsd-client v1.1.2

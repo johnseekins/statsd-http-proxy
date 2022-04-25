@@ -1,3 +1,10 @@
+## 1.1
+  * pull vendoring into local repo
+  * build against Go 1.17
+  * better linting/testing in build
+  * pull in gometric statsd client
+  * make JSON input values consistent (no `n` vs. `value` vs. `dur`) so clients can more easily send data
+
 ## 1.0-stable
   * use `alexcesaro/statsd`
   * adapt the stats interface
