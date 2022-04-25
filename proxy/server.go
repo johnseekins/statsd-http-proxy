@@ -12,9 +12,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/InjectiveLabs/statsd-http-proxy/proxy/routehandler"
-	"github.com/InjectiveLabs/statsd-http-proxy/proxy/router"
-	"github.com/InjectiveLabs/statsd-http-proxy/proxy/statsdclient"
+	"github.com/johnseekins/statsd-http-proxy/proxy/routehandler"
+	"github.com/johnseekins/statsd-http-proxy/proxy/router"
+	"github.com/johnseekins/statsd-http-proxy/proxy/statsdclient"
 )
 
 // Server is a proxy server between HTTP REST API and UDP Connection to StatsD

@@ -1,6 +1,6 @@
 .PHONY: help all test fmt lint vendor-update build clean
 
-NAME := statsd-http-proxy
+NAME := github.com/johnseekins/statsd-http-proxy
 GO_VER := 1.17.3
 BUILDTIME ?= $(shell date)
 BUILDUSER ?= $(shell id -u -n)

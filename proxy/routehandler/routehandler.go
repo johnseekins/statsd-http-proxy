@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/InjectiveLabs/statsd-http-proxy/proxy/statsdclient"
+	"github.com/johnseekins/statsd-http-proxy/proxy/statsdclient"
 )
 
 // RouteHandler as a collection of route handlers
