@@ -3,9 +3,6 @@ package proxy
 import (
 	"context"
 	"fmt"
-	"io"
-	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -15,12 +12,14 @@ import (
 	"github.com/johnseekins/statsd-http-proxy/proxy/routehandler"
 	"github.com/johnseekins/statsd-http-proxy/proxy/router"
 	"github.com/johnseekins/statsd-http-proxy/proxy/statsdclient"
+	log "github.com/sirupsen/logrus"
 )
 
 // Server is a proxy server between HTTP REST API and UDP Connection to StatsD
 type Server struct {
 	httpAddress string
 	httpServer  *http.Server
+	statsdClient statsdclient.StatsdClientInterface
 	tlsCert     string
 	tlsKey      string
 }
@@ -40,29 +39,18 @@ func NewServer(
 	tokenSecret string,
 	verbose bool,
 ) *Server {
-	// configure logging
-	var logOutput io.Writer
-	if verbose {
-		logOutput = os.Stderr
-	} else {
-		logOutput = ioutil.Discard
-	}
-
-	log.SetOutput(logOutput)
-
-	logger := log.New(logOutput, "", log.LstdFlags)
-
 	// prepare metric prefix
-	if metricPrefix != "" && (metricPrefix)[len(metricPrefix)-1:] != "." {
-		metricPrefix = metricPrefix + "."
+	if metricPrefix != "" && (metricPrefix)[len(metricPrefix)-1:] != "_" {
+		metricPrefix = metricPrefix + "_"
 	}
 
 	// create StatsD Client
-	statsdclient.Init(fmt.Sprintf("%s:%d", statsdHost, statsdPort), metricPrefix)
+	statsdClient := statsdclient.NewGoMetricClient(statsdHost, statsdPort)
 
 	// build route handler
 	routeHandler := routehandler.NewRouteHandler(
-		statsdclient.Client(),
+		statsdClient,
+		metricPrefix,
 	)
 
 	// build router
@@ -75,7 +63,6 @@ func NewServer(
 	httpServer := &http.Server{
 		Addr:           httpAddress,
 		Handler:        httpServerHandler,
-		ErrorLog:       logger,
 		ReadTimeout:    time.Duration(httpReadTimeout) * time.Second,
 		WriteTimeout:   time.Duration(httpWriteTimeout) * time.Second,
 		IdleTimeout:    time.Duration(httpIdleTimeout) * time.Second,
@@ -85,6 +72,7 @@ func NewServer(
 	statsdHTTPProxyServer := Server{
 		httpAddress,
 		httpServer,
+		statsdClient,
 		tlsCert,
 		tlsKey,
 	}
@@ -100,10 +88,11 @@ func (proxyServer *Server) Listen() {
 
 	// start HTTP/HTTPS proxy to StatsD
 	go func() {
-		log.Printf("Starting HTTP server at %s", proxyServer.httpAddress)
+		log.WithFields(log.Fields{"Address": proxyServer.httpAddress}).Info("Starting HTTP server")
 
 		// open StatsD connection
-		defer statsdclient.Close()
+		proxyServer.statsdClient.Open()
+		defer proxyServer.statsdClient.Close()
 
 		// open HTTP connection
 		var err error
@@ -114,15 +103,14 @@ func (proxyServer *Server) Listen() {
 		}
 
 		if err != nil && err != http.ErrServerClosed {
-			log.Fatal(err)
-			log.Fatal("Can not start HTTP server")
+			log.WithFields(log.Fields{"Error": err}).Fatal("Cannot start HTTP Server")
 		}
 	}()
 
 	<-gracefullStopSignalHandler
 
 	// Gracefull shutdown
-	log.Printf("Stopping HTTP server")
+	log.Info("Stopping HTTP server")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer func() {
@@ -130,8 +118,8 @@ func (proxyServer *Server) Listen() {
 	}()
 
 	if err := proxyServer.httpServer.Shutdown(ctx); err != nil {
-		log.Fatalf("HTTP Server Shutdown Failed:%+v", err)
+		log.WithFields(log.Fields{"error": err}).Fatal("HTTP Server Shutdown Failed")
 	}
 
-	log.Printf("HTTP server stopped successfully")
+	log.Info("HTTP server stopped successfully")
 }

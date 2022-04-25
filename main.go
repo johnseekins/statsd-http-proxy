@@ -3,13 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
 	"runtime"
 
 	"github.com/johnseekins/statsd-http-proxy/proxy"
+	log "github.com/sirupsen/logrus"
 )
 
 // Version is a current git tag
@@ -37,6 +37,8 @@ const defaultStatsDPort = 8125
 
 func main() {
 	// declare command line options
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(os.Stdout)
 	var httpHost = flag.String("http-host", defaultHTTPHost, "HTTP Host")
 	var httpPort = flag.Int("http-port", defaultHTTPPort, "HTTP Port")
 	var httpReadTimeout = flag.Int("http-timeout-read", defaultHTTPReadTimeout, "The maximum duration in seconds for reading the entire request, including the body")
@@ -55,14 +57,15 @@ func main() {
 	// get flags
 	flag.Parse()
 
+	if *verbose {
+		log.SetLevel(log.DebugLevel)
+	} else {
+		log.SetLevel(log.InfoLevel)
+	}
+
 	// show version and exit
 	if *version {
-		fmt.Printf(
-			"StatsD HTTP Proxy v.%s, built on %s by %s\n",
-			Version,
-			BuildTime,
-			BuildUser,
-		)
+		log.WithFields(log.Fields{"Version": Version, "BuildTime": BuildTime, "BuildUser": BuildUser}).Info("Version Info")
 		os.Exit(0)
 	}
 
@@ -74,10 +77,10 @@ func main() {
 		// start debug server
 		profilerHTTPAddress := fmt.Sprintf("localhost:%d", *profilerHTTPort)
 		go func() {
-			log.Println("Profiler started at " + profilerHTTPAddress)
-			log.Println("Open 'http://" + profilerHTTPAddress + "/debug/pprof/' in you browser or use 'go tool pprof http://" + profilerHTTPAddress + "/debug/pprof/heap' from console")
-			log.Println("See details about pprof in https://golang.org/pkg/net/http/pprof/")
-			log.Println(http.ListenAndServe(profilerHTTPAddress, nil))
+			log.WithFields(log.Fields{"Address": profilerHTTPAddress}).Info("Profiler started")
+			log.WithFields(log.Fields{}).Info(fmt.Sprintf("Open 'http://" + profilerHTTPAddress + "/debug/pprof/' in you browser or use 'go tool pprof http://" + profilerHTTPAddress + "/debug/pprof/heap' from console"))
+			log.Info("See details about pprof in https://golang.org/pkg/net/http/pprof/")
+			log.Info(http.ListenAndServe(profilerHTTPAddress, nil))
 		}()
 	}
 

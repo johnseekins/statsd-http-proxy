@@ -11,6 +11,7 @@ import (
 type CountRequest struct {
 	Value    int    `json:"value,omitempty"`
 	Tags string `json:"tags,omitempty"`
+	SampleRate float64 `json:"sampleRate"`
 }
 
 const maxBodySize = 10 * 1024 * 1024
@@ -34,43 +35,14 @@ func (routeHandler *RouteHandler) handleCountRequest(w http.ResponseWriter, r *h
 		return
 	}
 
-	reqTags := strings.TrimSpace(req.Tags)
-	if validateTags(reqTags) {
-		key += "," + reqTags
+    key += processTags(req.Tags)	
+
+	var sampleRate float64 = 1
+	if req.SampleRate != 0 {
+		sampleRate = float64(req.SampleRate)
 	}
 
-	routeHandler.statter.Count(key, req.Value)
-}
-
-type IncrRequest struct {
-	Tags string `json:"tags,omitempty"`
-}
-
-func (routeHandler *RouteHandler) handleIncrementRequest(w http.ResponseWriter, r *http.Request, key string) {
-	if contentType := r.Header.Get("Content-Type"); contentType != "application/json" {
-		http.Error(w, "Unsupported content type", 400)
-		return
-	}
-
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, maxBodySize))
-	if err != nil {
-		http.Error(w, err.Error(), 400)
-		return
-	}
-	r.Body.Close()
-
-	var req IncrRequest
-	if err := json.Unmarshal(body, &req); err != nil {
-		http.Error(w, err.Error(), 400)
-		return
-	}
-
-	reqTags := strings.TrimSpace(req.Tags)
-	if validateTags(reqTags) {
-		key += "," + reqTags
-	}
-
-	routeHandler.statter.Increment(key)
+	routeHandler.statsdClient.Count(key, req.Value, float32(sampleRate))
 }
 
 type GaugeRequest struct {
@@ -97,17 +69,15 @@ func (routeHandler *RouteHandler) handleGaugeRequest(w http.ResponseWriter, r *h
 		return
 	}
 
-	reqTags := strings.TrimSpace(req.Tags)
-	if validateTags(reqTags) {
-		key += "," + reqTags
-	}
+    key += processTags(req.Tags)	
 
-	routeHandler.statter.Gauge(key, req.Value)
+	routeHandler.statsdClient.Gauge(key, req.Value)
 }
 
 type TimingRequest struct {
-	Value int    `json:"value,omitempty"`
+	Value int64    `json:"value,omitempty"`
 	Tags     string `json:"tags,omitempty"`
+	SampleRate float64 `json:"sampleRate"`
 }
 
 func (routeHandler *RouteHandler) handleTimingRequest(w http.ResponseWriter, r *http.Request, key string) {
@@ -129,20 +99,23 @@ func (routeHandler *RouteHandler) handleTimingRequest(w http.ResponseWriter, r *
 		return
 	}
 
-	reqTags := strings.TrimSpace(req.Tags)
-	if validateTags(reqTags) {
-		key += "," + reqTags
+    key += processTags(req.Tags)	
+
+	var sampleRate float64 = 1
+	if req.SampleRate != 0 {
+		sampleRate = float64(req.SampleRate)
 	}
 
-	routeHandler.statter.Timing(key, req.Value)
+
+	routeHandler.statsdClient.Timing(key, req.Value, float32(sampleRate))
 }
 
-type UniqueRequest struct {
-	Value string `json:"value,omitempty"`
+type SetRequest struct {
+	Value int `json:"value,omitempty"`
 	Tags  string `json:"tags,omitempty"`
 }
 
-func (routeHandler *RouteHandler) handleUniqueRequest(w http.ResponseWriter, r *http.Request, key string) {
+func (routeHandler *RouteHandler) handleSetRequest(w http.ResponseWriter, r *http.Request, key string) {
 	if contentType := r.Header.Get("Content-Type"); contentType != "application/json" {
 		http.Error(w, "Unsupported content type", 400)
 		return
@@ -155,36 +128,33 @@ func (routeHandler *RouteHandler) handleUniqueRequest(w http.ResponseWriter, r *
 	}
 	r.Body.Close()
 
-	var req UniqueRequest
+	var req SetRequest
 	if err := json.Unmarshal(body, &req); err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
 
-	reqTags := strings.TrimSpace(req.Tags)
-	if validateTags(reqTags) {
-		key += "," + reqTags
-	}
+    key += processTags(req.Tags)	
 
-	routeHandler.statter.Unique(key, req.Value)
+	routeHandler.statsdClient.Set(key, req.Value)
 }
 
-func validateTags(tagsList string) bool {
-	list := strings.Split(tagsList, ",")
+func processTags(tagsList string) string {
+	list := strings.Split(strings.TrimSpace(tagsList), ",")
 	if len(list) == 0 {
-		return false
+		return ""
 	}
 
 	for _, pair := range list {
 		pairItems := strings.Split(pair, "=")
 		if len(pairItems) != 2 {
-			return false
+			return ""
 		} else if len(strings.TrimSpace(pairItems[0])) == 0 {
-			return false
+			return ""
 		} else if len(strings.TrimSpace(pairItems[1])) == 0 {
-			return false
+			return ""
 		}
 	}
 
-	return true
+	return "," + tagsList
 }
