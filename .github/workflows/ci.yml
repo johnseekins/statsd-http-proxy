@@ -8,8 +8,8 @@ on:
 
 jobs:
 
-  build:
-    name: Build
+  test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
 
@@ -19,5 +19,13 @@ jobs:
     - name: run tests
       run: make test
 
+  build:
+    name: Build Package
+    runs-on: ubuntu-latest
+    needs:
+      - test
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
     - name: Build
-      run: make
+      run: make build
