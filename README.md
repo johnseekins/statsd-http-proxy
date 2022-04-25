@@ -1,3 +1,141 @@
+# StatsD Rest Proxy
+
+StatsD uses UDP connections, and  can not be used directly from browser. This server is a HTTP proxy to StatsD, useful for sending metrics to StatsD from frontend by AJAX.
+
+Requests may be optionally authenticated using JWT tokens.
+
+## Table of contents
+
+* [Installation](#installation)
+* [Requirements](#requirements)
+* [Proxy client for browser](#proxy-client-for-browser)
+* [Nginx config](#nginx-config)
+* [Usage](#usage)
+* [Authentication](#authentication)
+* [Rest resources](#rest-resources)
+  * [Heartbeat](#heartbeat)
+  * [Count](#count)
+  * [Gauge](#gauge)
+  * [Timing](#timing)
+  * [Set](#set)
+* [Response](#response)
+* [Testing](#testing)
+* [Benchmark](#benchmark)
+* [Useful resources](#useful-resources)
+
+
+## Installation
+
+```
+# clone repo
+make
+```
+
+Also available [Docker image](https://hub.docker.com/r/gometric/statsd-http-proxy/):
+
+[![docker](https://img.shields.io/docker/pulls/gometric/statsd-http-proxy.svg?style=flat)](https://hub.docker.com/r/gometric/statsd-http-proxy/)
+
+```
+docker run -p 80:80 gometric/statsd-http-proxy:latest --verbose
+```
+
+Secure connection:
+
+```
+docker run -p 4433:4433 -v "$(pwd)":/certs/  gometric/statsd-http-proxy:latest --verbose --http-port=4433 --tls-cert=/certs/cert.pem --tls-key=/certs/key.pem
+```
+
+## Requirements
+
+* [GoMetric/go-statsd-client](https://github.com/GoMetric/go-statsd-client) - StatsD client library for Go
+* [dgrijalva/jwt-go](https://github.com/dgrijalva/jwt-go) - JSON Web Tokens builder and parser
+* [gorilla/mux](https://github.com/gorilla/mux) - URL router and dispatcher
+
+## Proxy client for browser
+
+Basic implementation of proxy client may be found at https://github.com/GoMetric/statsd-http-proxy-client.
+
+## Nginx config
+
+Configuration of Nginx balancer:
+
+```
+server {
+    listen 443 http2;
+    server_name statsd-proxy.example.com;
+    ssl on;
+    ssl_certificate     /etc/pki/nginx/ssl.crt;
+    ssl_certificate_key /etc/pki/nginx/ssl.key;
+    upstream statsd_proxy {
+        keepalive 100;
+        server statsd-proxy-1:8825 max_fails=0;
+        server statsd-proxy-2:8825 max_fails=0;
+    }
+
+    location / {
+        proxy_pass http://statsd_proxy;
+        proxy_redirect off;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "keep-alive";
+    }
+}
+```
+
+
+## Usage
+
+* Run server (HTTP):
+
+```bash
+statsd-http-proxy \
+    --verbose \
+    --http-host=127.0.0.1 \
+    --http-port=8080 \
+    --statsd-host=127.0.0.1 \
+    --statsd-port=8125 \
+    --jwt-secret=somesecret \
+    --metric-prefix=prefix.subprefix
+```
+
+* Run server (HTTPS):
+
+```bash
+statsd-http-proxy \
+    --verbose \
+    --http-host=127.0.0.1 \
+    --http-port=433 \
+    --tls-cert=cert.pem \
+    --tls-key=key.pem \
+    --statsd-host=127.0.0.1 \
+    --statsd-port=8125 \
+    --jwt-secret=somesecret \
+    --metric-prefix=prefix.subprefix
+```
+
+Print server version and exit:
+
+```bash
+statsd-http-proxy --version
+```
+
+Command line arguments:
+
+| Parameter       | Description                          | Default value                                                                     |
+|-----------------|--------------------------------------|-----------------------------------------------------------------------------------|
+| verbose         | Print debug info to stderr           | Optional. Default false                                                           |
+| http-host       | Host of HTTP server                  | Optional. Default 127.0.0.1. To accept connections on any interface, set to ""    |
+| http-port       | Port of HTTP server                  | Optional. Default 80                                                              |
+| http-timeout-read | The maximum duration in seconds for reading the entire request, including the body | Optional. Defaults to 1 second |
+| http-timeout-write | The maximum duration in seconds before timing out writes of the respons | Optional. Defaults to 1 second  |
+| http-timeout-idle | The maximum amount of time in seconds to wait for the next request when keep-alives are enabled | Optional. Defaults to 1 second |
+| tls-cert        | TLS certificate for the HTTPS        | Optional. Default "" to use HTTP. If both tls-cert and tls-key set, HTTPS is used |
+| tls-key         | TLS private key for the HTTPS        | Optional. Default "" to use HTTP. If both tls-cert and tls-key set, HTTPS is used |
+| statsd-host     | Host of StatsD instance              | Optional. Default 127.0.0.1                                                       |
+| statsd-port     | Port of StatsD instance              | Optional. Default 8125                                                            |
+| jwt-secret      | JWT token secret                     | Optional. If not set, server accepts all connections                              |
+| metric-prefix   | Prefix, added to any metric name     | Optional. If not set, do not add prefix                                           |
+| version         | Print version of server and exit     | Optional                                                                          |
+
 # StatsD HTTP Proxy
 
 StatsD HTTP proxy with REST interface for using in browsers.

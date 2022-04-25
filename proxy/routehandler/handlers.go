@@ -9,7 +9,7 @@ import (
 )
 
 type CountRequest struct {
-	N    int    `json:"n,omitempty"`
+	Value    int    `json:"value,omitempty"`
 	Tags string `json:"tags,omitempty"`
 }
 
@@ -39,7 +39,7 @@ func (routeHandler *RouteHandler) handleCountRequest(w http.ResponseWriter, r *h
 		key += "," + reqTags
 	}
 
-	routeHandler.statter.Count(key, req.N)
+	routeHandler.statter.Count(key, req.Value)
 }
 
 type IncrRequest struct {
@@ -106,7 +106,7 @@ func (routeHandler *RouteHandler) handleGaugeRequest(w http.ResponseWriter, r *h
 }
 
 type TimingRequest struct {
-	Duration int    `json:"dur,omitempty"`
+	Value int    `json:"value,omitempty"`
 	Tags     string `json:"tags,omitempty"`
 }
 
@@ -134,7 +134,7 @@ func (routeHandler *RouteHandler) handleTimingRequest(w http.ResponseWriter, r *
 		key += "," + reqTags
 	}
 
-	routeHandler.statter.Timing(key, req.Duration)
+	routeHandler.statter.Timing(key, req.Value)
 }
 
 type UniqueRequest struct {

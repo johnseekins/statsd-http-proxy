@@ -9,7 +9,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/InjectiveLabs/statsd-http-proxy/proxy"
+	"github.com/johnseekins/statsd-http-proxy/proxy"
 )
 
 // Version is a current git commit hash and tag

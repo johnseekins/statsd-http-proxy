@@ -1,3 +1,6 @@
+# github.com/GoMetric/go-statsd-client v1.1.2
+## explicit; go 1.12
+github.com/GoMetric/go-statsd-client
 # github.com/InjectiveLabs/statsd-http-proxy v1.0.1
 ## explicit; go 1.14
 github.com/InjectiveLabs/statsd-http-proxy/proxy
@@ -8,6 +11,9 @@ github.com/InjectiveLabs/statsd-http-proxy/proxy/statsdclient
 # github.com/alexcesaro/statsd v2.0.0+incompatible
 ## explicit
 github.com/alexcesaro/statsd
+# github.com/cactus/go-statsd-client/v5 v5.0.0
+## explicit; go 1.11
+github.com/cactus/go-statsd-client/v5/statsd
 # github.com/davecgh/go-spew v1.1.0
 ## explicit
 github.com/davecgh/go-spew/spew
