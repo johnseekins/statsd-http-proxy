@@ -9,18 +9,7 @@ Requests may be optionally authenticated using JWT tokens.
 * [Installation](#installation)
 * [Nginx config](#nginx-config)
 * [Usage](#usage)
-* [Authentication](#authentication)
-* [Rest resources](#rest-resources)
-  * [Heartbeat](#heartbeat)
-  * [Count](#count)
-  * [Gauge](#gauge)
-  * [Timing](#timing)
-  * [Set](#set)
-* [Response](#response)
-* [Testing](#testing)
-* [Benchmark](#benchmark)
-* [Useful resources](#useful-resources)
-
+* [Client Interactions](#client-interactions)
 
 ## Installation
 
@@ -34,13 +23,13 @@ Also available [Docker image](https://hub.docker.com/r/johnseekins/statsd-http-p
 [![docker](https://img.shields.io/docker/pulls/johnseekins/statsd-http-proxy.svg?style=flat)](https://hub.docker.com/r/johnseekins/statsd-http-proxy/)
 
 ```
-docker run -p 80:80 gometric/statsd-http-proxy:latest --verbose
+docker run -p 80:80 johnseekins/statsd-http-proxy:latest --verbose
 ```
 
 Secure connection:
 
 ```
-docker run -p 4433:4433 -v "$(pwd)":/certs/  gometric/statsd-http-proxy:latest --verbose --http-port=4433 --tls-cert=/certs/cert.pem --tls-key=/certs/key.pem
+docker run -p 4433:4433 -v "$(pwd)":/certs/  johnseekins/statsd-http-proxy:latest --verbose --http-port=4433 --tls-cert=/certs/cert.pem --tls-key=/certs/key.pem
 ```
 
 ## Nginx config
