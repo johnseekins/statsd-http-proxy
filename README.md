@@ -7,8 +7,6 @@ Requests may be optionally authenticated using JWT tokens.
 ## Table of contents
 
 * [Installation](#installation)
-* [Requirements](#requirements)
-* [Proxy client for browser](#proxy-client-for-browser)
 * [Nginx config](#nginx-config)
 * [Usage](#usage)
 * [Authentication](#authentication)
@@ -31,9 +29,9 @@ Requests may be optionally authenticated using JWT tokens.
 make
 ```
 
-Also available [Docker image](https://hub.docker.com/r/gometric/statsd-http-proxy/):
+Also available [Docker image](https://hub.docker.com/r/johnseekins/statsd-http-proxy/):
 
-[![docker](https://img.shields.io/docker/pulls/gometric/statsd-http-proxy.svg?style=flat)](https://hub.docker.com/r/gometric/statsd-http-proxy/)
+[![docker](https://img.shields.io/docker/pulls/johnseekins/statsd-http-proxy.svg?style=flat)](https://hub.docker.com/r/johnseekins/statsd-http-proxy/)
 
 ```
 docker run -p 80:80 gometric/statsd-http-proxy:latest --verbose
@@ -44,16 +42,6 @@ Secure connection:
 ```
 docker run -p 4433:4433 -v "$(pwd)":/certs/  gometric/statsd-http-proxy:latest --verbose --http-port=4433 --tls-cert=/certs/cert.pem --tls-key=/certs/key.pem
 ```
-
-## Requirements
-
-* [GoMetric/go-statsd-client](https://github.com/GoMetric/go-statsd-client) - StatsD client library for Go
-* [dgrijalva/jwt-go](https://github.com/dgrijalva/jwt-go) - JSON Web Tokens builder and parser
-* [gorilla/mux](https://github.com/gorilla/mux) - URL router and dispatcher
-
-## Proxy client for browser
-
-Basic implementation of proxy client may be found at https://github.com/GoMetric/statsd-http-proxy-client.
 
 ## Nginx config
 
@@ -136,10 +124,7 @@ Command line arguments:
 | metric-prefix   | Prefix, added to any metric name     | Optional. If not set, do not add prefix                                           |
 | version         | Print version of server and exit     | Optional                                                                          |
 
-# StatsD HTTP Proxy
-
-StatsD HTTP proxy with REST interface for using in browsers.
-
+## Client Interactions
 
 Sample code to send metric in browser with JWT token in header:
 
@@ -149,6 +134,7 @@ $.ajax({
     method: 'POST',
     headers: {
         'X-JWT-Token': 'some-jwt-token'
+        'Content-Type': 'application/json'
     },
     data: {
         value: 100500
@@ -172,10 +158,6 @@ data: {
 
 Adds count to the bucket. Expected `value` as integer. By default `value` is 0.
 
-### `incr`
-
-Increments the given bucket. It is equivalent to count with `value` default to 1.
-
 ### `gauge`
 
 Sets the gauge metric. Expected `value` as integer. Before setting negative gauge, it needs to be set to `0`.
@@ -184,6 +166,6 @@ Sets the gauge metric. Expected `value` as integer. Before setting negative gaug
 
 Adds timing to the bucket. Expected `value` as milliseconds integer. Default is `0`.
 
-### `uniq`
+### `set`
 
-Adds unique value in a set bucket. Expected `value` as string. Sets are a relatively new concept in recent versions of StatsD. Sets track the number of unique elements belonging to a group. At each flush interval, the statsd backend will push the number of unique elements in the set as a single gauge value.
+Adds value in a set bucket. Expected `value` as string. Sets are a relatively new concept in recent versions of StatsD. Sets track the number of unique elements belonging to a group. At each flush interval, the statsd backend will push the number of unique elements in the set as a single gauge value.

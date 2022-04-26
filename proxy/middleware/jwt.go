@@ -26,6 +26,7 @@ func ValidateJWT(next http.Handler, tokenSecret string) http.Handler {
 			}
 
 			if tokenString == "" {
+				log.Error("Token not specified")
 				http.Error(w, "Token not specified", 401)
 				return
 			}
@@ -33,12 +34,14 @@ func ValidateJWT(next http.Handler, tokenSecret string) http.Handler {
 			// parse JWT
 			_, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+					log.Error("Bad signing format")
 					return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 				}
 				return []byte(tokenSecret), nil
 			})
 
 			if err != nil {
+				log.Error("Error parsing token")
 				http.Error(w, "Error parsing token", 403)
 				return
 			}
