@@ -1,7 +1,5 @@
 FROM debian:stable-slim
 
-ARG VERSION
-
 COPY statsd-http-proxy /usr/local/bin/
 RUN apt-get update -qq \
   && apt-get install -y -qq --no-install-recommends curl \

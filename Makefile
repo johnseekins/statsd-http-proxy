@@ -1,7 +1,7 @@
 .PHONY: help all test fmt lint vendor-update build clean
 
-DOCKER_USER := johnseekins
-GH_ADDR := github.com/johnseekins
+GH_ADDR := $(shell grep -A1 '\[remote "origin"\]' .git/config | grep url | cut -d"=" -f2- | grep -o "github.com[/:].*/" | tr -d "/" | sed 's|:|/|g')
+DOCKER_USER := $(shell grep -A1 '\[remote "origin"\]' .git/config | grep url | cut -d"=" -f2- | grep -o "github.com[/:].*/" | tr -d "/" | sed 's|:|/|g' | cut -d"/" -f2)
 NAME := statsd-http-proxy
 GO_VER := 1.17.9
 CURRENT_UID := $(shell id -u)
