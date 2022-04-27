@@ -2,6 +2,7 @@ package routehandler
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -18,19 +19,28 @@ type CountRequest struct {
 
 const maxBodySize = 2000 * 1024 * 1024
 
-func (routeHandler *RouteHandler) handleCountRequest(w http.ResponseWriter, r *http.Request, key string) {
+func procBody(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	if contentType := r.Header.Get("Content-Type"); contentType != "application/json" {
 		http.Error(w, "Unsupported content type", 400)
-		return
+		return []byte(""), fmt.Errorf("Unsupported content type")
 	}
 
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, maxBodySize))
 	if err != nil {
 		http.Error(w, err.Error(), 400)
-		return
+		return []byte(""), err
 	}
 	r.Body.Close()
 	log.WithFields(log.Fields{"Body": string(body)}).Debug("Received message")
+
+	return body, nil
+}
+
+func (routeHandler *RouteHandler) handleCountRequest(w http.ResponseWriter, r *http.Request, key string) {
+	body, err := procBody(w, r)
+	if err != nil {
+		return
+	}
 	var req CountRequest
 	if err := json.Unmarshal(body, &req); err != nil {
 		http.Error(w, err.Error(), 400)
@@ -53,17 +63,10 @@ type GaugeRequest struct {
 }
 
 func (routeHandler *RouteHandler) handleGaugeRequest(w http.ResponseWriter, r *http.Request, key string) {
-	if contentType := r.Header.Get("Content-Type"); contentType != "application/json" {
-		http.Error(w, "Unsupported content type", 400)
-		return
-	}
-
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, maxBodySize))
+	body, err := procBody(w, r)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
 		return
 	}
-	r.Body.Close()
 
 	var req GaugeRequest
 	if err := json.Unmarshal(body, &req); err != nil {
@@ -83,17 +86,10 @@ type TimingRequest struct {
 }
 
 func (routeHandler *RouteHandler) handleTimingRequest(w http.ResponseWriter, r *http.Request, key string) {
-	if contentType := r.Header.Get("Content-Type"); contentType != "application/json" {
-		http.Error(w, "Unsupported content type", 400)
-		return
-	}
-
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, maxBodySize))
+	body, err := procBody(w, r)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
 		return
 	}
-	r.Body.Close()
 
 	var req TimingRequest
 	if err := json.Unmarshal(body, &req); err != nil {
@@ -118,17 +114,10 @@ type SetRequest struct {
 }
 
 func (routeHandler *RouteHandler) handleSetRequest(w http.ResponseWriter, r *http.Request, key string) {
-	if contentType := r.Header.Get("Content-Type"); contentType != "application/json" {
-		http.Error(w, "Unsupported content type", 400)
-		return
-	}
-
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, maxBodySize))
+	body, err := procBody(w, r)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
 		return
 	}
-	r.Body.Close()
 
 	var req SetRequest
 	if err := json.Unmarshal(body, &req); err != nil {
