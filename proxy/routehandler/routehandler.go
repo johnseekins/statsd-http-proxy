@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/johnseekins/statsd-http-proxy/proxy/statsdclient"
-	log "github.com/sirupsen/logrus"
 )
 
 // RouteHandler as a collection of route handlers
@@ -34,7 +33,6 @@ func (routeHandler *RouteHandler) HandleMetric(
 	metricType string,
 	metricKey string,
 ) {
-	log.WithFields(log.Fields{"type": metricType, "metric": metricKey}).Debug("Processing Metric")
 	switch metricType {
 	case "count":
 		routeHandler.handleCountRequest(w, r, metricKey)
